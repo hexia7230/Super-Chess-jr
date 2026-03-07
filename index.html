@@ -277,6 +277,64 @@
             }
         }
 
+        /* ── RAID TIMER ── */
+        @keyframes timerPulseUrgent {
+            0%, 100% { color: #ff2222; text-shadow: 0 0 10px rgba(255,0,0,0.8); transform: scale(1); }
+            50% { color: #ff6666; text-shadow: 0 0 25px rgba(255,0,0,1), 0 0 50px rgba(255,0,0,0.5); transform: scale(1.08); }
+        }
+        @keyframes timerBarShrink {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+        #raid-timer-wrap {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 0.5rem 0.8rem 0.4rem;
+            background: rgba(255, 0, 0, 0.07);
+            border: 1px solid rgba(255, 50, 50, 0.3);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        body.raid-mode #raid-timer-wrap {
+            display: flex;
+        }
+        .raid-timer-label {
+            font-size: 0.5rem;
+            letter-spacing: 0.25rem;
+            text-transform: uppercase;
+            color: rgba(255, 100, 100, 0.6);
+        }
+        #raid-timer-count {
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: #ff2222;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+            line-height: 1;
+            font-family: 'DM Mono', monospace;
+            transition: color 0.2s;
+        }
+        #raid-timer-count.urgent {
+            animation: timerPulseUrgent 0.4s ease-in-out infinite;
+        }
+        #raid-timer-bar-track {
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 0, 0, 0.12);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        #raid-timer-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ff6600);
+            border-radius: 2px;
+            width: 100%;
+            transform-origin: left;
+            transition: none;
+        }
+
         /* ── PLAYBACK SKILL PANEL ── */
         @keyframes skillReadyPulse {
 
@@ -1340,6 +1398,142 @@
                 max-height: 80px;
             }
         }
+
+        /* ── PC 16:9 Layout ── */
+        @media (min-width: 1101px) {
+            body {
+                overflow: hidden;
+            }
+            #game-screen {
+                height: 100vh;
+                padding: 0.6rem 1rem;
+            }
+            .game-layout {
+                grid-template-columns: 200px 1fr 200px;
+                gap: 1rem;
+                height: 96vh;
+                max-height: none;
+                width: 100%;
+                max-width: none;
+            }
+            #chess-board {
+                width: min(88vh, calc(100vw - 460px));
+                height: min(88vh, calc(100vw - 460px));
+            }
+            .sq {
+                font-size: min(6.5vh, calc((100vw - 460px) / 8 * 0.85));
+            }
+            .panel {
+                height: 100%;
+                overflow: hidden;
+            }
+            .log-box {
+                flex: 1;
+                min-height: 0;
+            }
+        }
+
+        /* ── Smartphone portrait 9:16 / 9:21 ── */
+        @media (max-width: 540px) {
+            body {
+                overflow-y: auto;
+                overflow-x: hidden;
+                align-items: flex-start;
+            }
+            #app {
+                min-height: 100dvh;
+                align-items: flex-start;
+                padding: 0;
+            }
+            #game-screen {
+                padding: 0.4rem 0.3rem;
+                min-height: 100dvh;
+                justify-content: flex-start;
+            }
+            .game-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto auto;
+                gap: 0.35rem;
+                height: auto;
+                width: 100%;
+                padding: 0;
+            }
+            #chess-board {
+                width: min(98vw, 96vmin);
+                height: min(98vw, 96vmin);
+                font-size: inherit;
+            }
+            .sq {
+                font-size: min(10.5vw, 10.5vmin);
+            }
+            .board-wrap {
+                width: 100%;
+                justify-content: center;
+            }
+            .panel {
+                flex-direction: row;
+                flex-wrap: wrap;
+                width: 100%;
+                gap: 0.3rem;
+                height: auto;
+            }
+            #left-panel {
+                order: 2;
+            }
+            #right-panel {
+                order: 3;
+            }
+            .board-wrap {
+                order: 1;
+            }
+            .player-card {
+                flex: 1;
+                min-width: 140px;
+                padding: 0.5rem 0.6rem;
+            }
+            .depth-bar {
+                flex: 1;
+                min-width: 120px;
+            }
+            .log-box { display: none; }
+            .cap-box {
+                max-height: 55px;
+                font-size: 1rem;
+                flex: 1;
+                min-width: 100px;
+            }
+            #skill-row {
+                width: 100%;
+            }
+            .skill-btn {
+                min-height: 56px;
+            }
+            #raid-timer-wrap {
+                padding: 0.3rem 0.6rem 0.25rem;
+            }
+            #raid-timer-count {
+                font-size: 1.4rem;
+            }
+            h1.title {
+                font-size: clamp(3rem, 18vw, 5rem);
+            }
+            .start-btns {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+            .start-btn {
+                padding: 0.8rem 2rem;
+            }
+        }
+
+        /* ── Very tall phones (9:21) extra vertical squeeze ── */
+        @media (max-width: 400px) {
+            #chess-board {
+                width: 97vw;
+                height: 97vw;
+            }
+            .sq { font-size: 11vw; }
+        }
     </style>
 </head>
 
@@ -1411,6 +1605,14 @@
                         <div>
                             <div class="p-name">Player (White)</div>
                             <div class="p-status live" id="me-status">Your Turn</div>
+                        </div>
+                    </div>
+                    <!-- RAID TIMER (Raid Mode only) -->
+                    <div id="raid-timer-wrap">
+                        <div class="raid-timer-label">Time Remaining</div>
+                        <div id="raid-timer-count">10</div>
+                        <div id="raid-timer-bar-track">
+                            <div id="raid-timer-bar"></div>
                         </div>
                     </div>
                     <!-- SKILL BUTTONS (Raid Mode only) -->
@@ -2043,6 +2245,12 @@ self.onmessage=function(e){
                 this.playback = null;
                 this.bgm = null;
                 this.worker = null;
+                /* Raid timer state */
+                this._timerInterval = null;
+                this._timerSec = 5;
+                this._timerMaxSec = 5;
+                this._timerRunning = false;
+                this._firstMove = true;     // first player move: timer disabled
                 this.bind();
                 this.buildWorker();
             }
@@ -2061,7 +2269,7 @@ self.onmessage=function(e){
                 };
             }
             bind() {
-                const click = () => this.playSfx('Click.ogg');
+                const click = () => this.playSfx('Click.mp3');
                 document.getElementById('start-btn').onclick = () => { click(); this.start(false); };
                 document.getElementById('raid-btn').onclick = () => { click(); this.start(true); };
                 document.getElementById('restart-btn').onclick = () => { click(); location.reload(); };
@@ -2069,6 +2277,7 @@ self.onmessage=function(e){
             }
             start(raid) {
                 this.isRaid = raid;
+                this._firstMove = true;
                 document.getElementById('start-screen').classList.add('hidden');
                 document.getElementById('game-screen').classList.add('active');
                 document.getElementById('ai-status').textContent = 'Idle';
@@ -2094,11 +2303,13 @@ self.onmessage=function(e){
 
             doPlayback() {
                 if (!this.playback || !this.playback.isReady) return;
-                if (this.g.snapshots.length < 2) return; /* need at least 2 snapshots (player + AI turn) */
+                if (this.g.snapshots.length < 2) return;
                 if (this.thinking) return;
+                /* Stop current timer while rewinding */
+                if (this.isRaid) this.stopRaidTimer();
 
-                this.playSfx('Move.ogg');
-                setTimeout(() => this.playSfx('Click.ogg'), 150);
+                this.playSfx('Move.mp3');
+                setTimeout(() => this.playSfx('Click.mp3'), 150);
 
                 /* VFX */
                 const board = document.getElementById('chess-board'), rect = board.getBoundingClientRect();
@@ -2120,6 +2331,112 @@ self.onmessage=function(e){
                 this.playback.onRewindUsed();
 
                 this.render();
+
+                /* Restart timer at 5s after rewind (player's turn resumes) */
+                if (this.isRaid) this.startRaidTimer();
+            }
+
+            /* ── Raid Timer ── */
+            startRaidTimer() {
+                if (!this.isRaid) return;
+                this.stopRaidTimer();
+                /* First move: show blank, no countdown */
+                if (this._firstMove) {
+                    this._showTimerBlank();
+                    return;
+                }
+                this._timerSec = 5;
+                this._timerMaxSec = 5;
+                this._timerRunning = true;
+                this._updateTimerUI();
+                this._timerInterval = setInterval(() => {
+                    if (!this._timerRunning) return;
+                    this._timerSec--;
+                    this._updateTimerUI();
+                    if (this._timerSec <= 0) {
+                        this.stopRaidTimer();
+                        this._doRandomMove();
+                    }
+                }, 1000);
+            }
+            stopRaidTimer() {
+                if (this._timerInterval) { clearInterval(this._timerInterval); this._timerInterval = null; }
+                this._timerRunning = false;
+                this._showTimerBlank();
+            }
+            _showTimerBlank() {
+                const el = document.getElementById('raid-timer-count');
+                const bar = document.getElementById('raid-timer-bar');
+                if (!el || !bar) return;
+                el.textContent = '—';
+                el.classList.remove('urgent');
+                bar.style.width = '0%';
+            }
+            _updateTimerUI(stopped = false) {
+                const el = document.getElementById('raid-timer-count');
+                const bar = document.getElementById('raid-timer-bar');
+                if (!el || !bar) return;
+                const sec = Math.max(0, this._timerSec);
+                el.textContent = sec;
+                el.classList.toggle('urgent', sec <= 3 && !stopped);
+                const maxSec = this._timerMaxSec || 10;
+                const pct = stopped ? 0 : (sec / maxSec) * 100;
+                bar.style.width = pct + '%';
+                const g = Math.round((sec / maxSec) * 120);
+                bar.style.background = `linear-gradient(90deg,rgb(255,0,0),rgb(255,${g},0))`;
+            }
+            _doRandomMove() {
+                if (this.g.turn !== 'w' || this.thinking) return;
+                const allMoves = this.g.allMoves('w');
+                if (allMoves.length === 0) return;
+
+                const MAT = { p: 100, n: 325, b: 350, r: 525, q: 1000, k: 20000 };
+
+                /* Score each move — higher = worse for player (more self-destructive) */
+                const scored = allMoves.map(m => {
+                    const piece = this.g.board[m.f];
+                    /* Handle pawn promo: auto-underpromo to knight (worst) */
+                    if (piece === 'P' && Math.floor(m.t / 8) === 0) m.promo = 'N';
+                    m.piece = piece;
+
+                    const sim = this.g.copy();
+                    sim.apply(m, true);
+
+                    /* How much material did white LOSE after this move + best AI reply */
+                    const afterWhite = sim.materialScore();
+
+                    /* Simulate best AI recapture: find move that hurts white most */
+                    const aiReplies = sim.allMoves('b');
+                    let worstAfterAI = afterWhite;
+                    for (const ar of aiReplies) {
+                        const sim2 = sim.copy();
+                        sim2.apply(ar, true);
+                        const s = sim2.materialScore();
+                        if (s < worstAfterAI) worstAfterAI = s;
+                    }
+
+                    /* Extra penalty: moving a high-value piece into attacked square */
+                    const pieceVal = MAT[piece.toLowerCase()] || 0;
+                    const destAttacked = sim.attacked(m.t, 'w'); // is dest attacked by black after move?
+                    const attackPenalty = destAttacked ? pieceVal : 0;
+
+                    /* selfDestructScore: lower material = worse for player = higher score here */
+                    const selfDestructScore = -worstAfterAI + attackPenalty;
+                    return { m, selfDestructScore };
+                });
+
+                /* Sort descending by selfDestructScore, pick worst move */
+                scored.sort((a, b) => b.selfDestructScore - a.selfDestructScore);
+                /* Among top equally-bad moves add tiny randomness so it's not 100% predictable */
+                const topScore = scored[0].selfDestructScore;
+                const topTier = scored.filter(s => s.selfDestructScore >= topScore - 50);
+                const chosen = topTier[Math.floor(Math.random() * topTier.length)].m;
+
+                this.fx.spawnComment('TIME UP! SELF DESTRUCT!', 'fc-danger');
+                this.fx.spawnComment('OMEGALUL', 'fc-danger');
+                this.fx.flashBoard('rgba(255,0,0,0.4)');
+                this.fx.shakeBoard();
+                this.exec(chosen, 'player');
             }
 
             render() {
@@ -2165,7 +2482,7 @@ self.onmessage=function(e){
 
             click(i) {
                 if (this.g.turn !== 'w' || this.thinking) return;
-                this.playSfx('Click.ogg');
+                this.playSfx('Click.mp3');
                 const mv = this.valid.find(m => m.t === i);
                 if (mv) {
                     if (this.g.board[mv.f] === 'P' && Math.floor(i / 8) === 0) { this.pend = mv; document.getElementById('promo-modal').classList.remove('hidden'); return; }
@@ -2179,6 +2496,13 @@ self.onmessage=function(e){
             promo(type) { this.pend.promo = type.toUpperCase(); document.getElementById('promo-modal').classList.add('hidden'); this.exec(this.pend, 'player'); this.pend = null; }
 
             exec(m, who) {
+                /* Stop raid timer when player moves */
+                if (who === 'player' && this.isRaid) {
+                    this.stopRaidTimer();
+                    /* Clear first-move flag */
+                    if (this._firstMove) this._firstMove = false;
+                }
+
                 /* Save snapshot before the move */
                 if (this.isRaid) this.g.saveSnapshot();
 
@@ -2191,8 +2515,8 @@ self.onmessage=function(e){
                 const isCheck = this.g.inCheck(this.g.turn);
 
                 if (this.isRaid) {
-                    if (isCapture) this.playSfx(who === 'player' ? 'Attack.ogg' : 'Damage.ogg');
-                    else this.playSfx('Move.ogg');
+                    if (isCapture) this.playSfx(who === 'player' ? 'Attack.mp3' : 'Damage.mp3');
+                    else this.playSfx('Move.mp3');
                     if (who === 'player') this.fx.onPlayerMove(m, scoreDiff, isCheck, isCapture, this.g);
                     /* Update playback skill counter */
                     if (this.playback) this.playback.onMovePlayed();
@@ -2206,6 +2530,8 @@ self.onmessage=function(e){
 
             aiMove() {
                 this.thinking = true;
+                /* Show blank timer during AI turn */
+                if (this.isRaid) this._showTimerBlank();
                 document.getElementById('ai-card').classList.add('active-card');
                 document.getElementById('me-card').classList.remove('active-card');
                 document.getElementById('ai-status').innerHTML = '<span class="think-spinner"></span>Searching...';
@@ -2238,6 +2564,8 @@ self.onmessage=function(e){
                 document.getElementById('me-status').textContent = 'Your Turn';
                 document.getElementById('me-status').classList.add('live');
                 document.getElementById('depth-cur').textContent = 'depth ' + depth;
+                /* Start raid timer for player's turn */
+                if (this.isRaid) this.startRaidTimer();
             }
 
             updateSide() {
@@ -2260,6 +2588,8 @@ self.onmessage=function(e){
 
             endGame(res) {
                 document.getElementById('game-overlay').classList.remove('hidden');
+                /* Stop raid timer */
+                if (this.isRaid) this.stopRaidTimer();
                 /* Lock playback skill */
                 if (this.playback) this.playback.disable();
                 const isAIWin = res === 'checkmate' && this.g.turn === 'w';
