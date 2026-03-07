@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chess</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Mono:wght@300;400;500&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --bg: #050810;
@@ -16,51 +19,553 @@
             --gold: #f0c060;
             --board-l: #d4c5a9;
             --board-d: #5a6e7a;
-            --glass: rgba(255,255,255,0.04);
-            --glass-b: rgba(255,255,255,0.09);
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-b: rgba(255, 255, 255, 0.09);
             --text: #eef2ff;
             --dim: #7a8aaa;
-            --chess-font: 'Segoe UI Symbol','Apple Symbols','DejaVu Sans','FreeSerif',sans-serif;
+            --chess-font: 'Segoe UI Symbol', 'Apple Symbols', 'DejaVu Sans', 'FreeSerif', sans-serif;
         }
-        * { margin:0; padding:0; box-sizing:border-box; user-select:none; }
+
+        body.raid-mode {
+            --bg: #08000f;
+            --gem1: #ff00ff;
+            --gem2: #aa00ff;
+            --gem3: #ff0080;
+            --gold: #00ffff;
+            --board-l: #2a1a3e;
+            --board-d: #140a24;
+            --glass: rgba(255, 0, 255, 0.08);
+            --glass-b: rgba(255, 0, 255, 0.22);
+            --text: #f8f0ff;
+            --dim: #aa88ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
         body {
             background: var(--bg);
             color: var(--text);
             font-family: 'DM Mono', monospace;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.8s;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 80%, rgba(0, 212, 170, 0.07) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 20%, rgba(196, 122, 255, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 50% at 50% 50%, rgba(0, 119, 255, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            transition: background 0.8s;
+        }
+
+        body.raid-mode::before {
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 80%, rgba(255, 0, 255, 0.18) 0%, transparent 55%),
+                radial-gradient(ellipse 60% 80% at 80% 20%, rgba(170, 0, 255, 0.22) 0%, transparent 55%),
+                radial-gradient(ellipse 50% 50% at 50% 50%, rgba(0, 255, 255, 0.08) 0%, transparent 65%);
+        }
+
+        #app {
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
             display: flex;
             justify-content: center;
             align-items: center;
         }
-        body::before {
-            content: '';
-            position: fixed; inset: 0;
-            background:
-                radial-gradient(ellipse 80% 60% at 20% 80%, rgba(0,212,170,0.07) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 80% at 80% 20%, rgba(196,122,255,0.08) 0%, transparent 60%),
-                radial-gradient(ellipse 50% 50% at 50% 50%, rgba(0,119,255,0.05) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: 0;
-        }
-        #app { width:100%; height:100%; position:relative; z-index:1; }
 
-        @keyframes fadeUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
-        @keyframes shimmer { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
-        @keyframes pulse { 0%,100% { opacity:0.6; } 50% { opacity:1; } }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shimmer {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes orangeGlow {
+
+            0%,
+            100% {
+                box-shadow: inset 0 0 15px #ff6600, 0 0 10px #ff6600;
+            }
+
+            50% {
+                box-shadow: inset 0 0 30px #ffcc00, 0 0 20px #ffcc00;
+            }
+        }
+
+        @keyframes purpleThreat {
+
+            0%,
+            100% {
+                box-shadow: inset 0 0 15px #aa00ff, 0 0 12px #aa00ff;
+            }
+
+            50% {
+                box-shadow: inset 0 0 35px #dd00ff, 0 0 25px #dd00ff;
+            }
+        }
+
+        .sq.danger-white {
+            animation: orangeGlow 1.2s infinite ease-in-out;
+            z-index: 5;
+        }
+
+        .sq.threat-black {
+            animation: purpleThreat 1s infinite ease-in-out;
+            z-index: 5;
+        }
+
+        @keyframes blueHint {
+
+            0%,
+            100% {
+                box-shadow: inset 0 0 15px #0066ff, 0 0 10px #0066ff;
+            }
+
+            50% {
+                box-shadow: inset 0 0 30px #00ccff, 0 0 20px #00ccff;
+            }
+        }
+
+        .sq.hint-blue {
+            animation: blueHint 1.5s infinite ease-in-out;
+            z-index: 5;
+        }
+
+        @keyframes raidPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(255, 0, 255, 0.3), 0 0 60px rgba(255, 0, 255, 0.1);
+            }
+
+            50% {
+                box-shadow: 0 0 40px rgba(255, 0, 255, 0.7), 0 0 100px rgba(255, 0, 255, 0.3), 0 0 150px rgba(170, 0, 255, 0.2);
+            }
+        }
+
+        @keyframes boardShake {
+
+            0%,
+            100% {
+                transform: translate(0, 0)rotate(0deg)
+            }
+
+            10% {
+                transform: translate(-4px, -2px)rotate(-0.3deg)
+            }
+
+            20% {
+                transform: translate(4px, 2px)rotate(0.3deg)
+            }
+
+            30% {
+                transform: translate(-3px, 3px)rotate(-0.2deg)
+            }
+
+            40% {
+                transform: translate(3px, -3px)rotate(0.2deg)
+            }
+
+            50% {
+                transform: translate(-2px, 2px)rotate(0deg)
+            }
+
+            60% {
+                transform: translate(2px, -2px)rotate(0deg)
+            }
+
+            70% {
+                transform: translate(-1px, 1px)rotate(0deg)
+            }
+        }
+
+        @keyframes particleFly {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1)
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(var(--dx), var(--dy)) scale(0)
+            }
+        }
+
+        @keyframes flashRed {
+
+            0%,
+            100% {
+                background: transparent
+            }
+
+            30% {
+                background: rgba(255, 0, 0, 0.15)
+            }
+        }
+
+        @keyframes flashGreen {
+
+            0%,
+            100% {
+                background: transparent
+            }
+
+            30% {
+                background: rgba(0, 255, 150, 0.12)
+            }
+        }
+
+        @keyframes raidScan {
+            0% {
+                transform: translateY(-100%)
+            }
+
+            100% {
+                transform: translateY(100vh)
+            }
+        }
+
+        /* ── PLAYBACK SKILL PANEL ── */
+        @keyframes skillReadyPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 1px rgba(0, 200, 255, 0.35),
+                    0 0 14px rgba(0, 200, 255, 0.15),
+                    inset 0 0 18px rgba(0, 200, 255, 0.05);
+            }
+
+            50% {
+                box-shadow: 0 0 0 1px rgba(0, 200, 255, 0.85),
+                    0 0 28px rgba(0, 200, 255, 0.4),
+                    inset 0 0 28px rgba(0, 200, 255, 0.1);
+            }
+        }
+
+        @keyframes playbackActivate {
+            0% {
+                transform: scale(1);
+                filter: brightness(1);
+            }
+
+            25% {
+                transform: scale(1.04);
+                filter: brightness(1.7);
+            }
+
+            65% {
+                transform: scale(0.98);
+                filter: brightness(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+                filter: brightness(1);
+            }
+        }
+
+        @keyframes rewindPulse {
+            0% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateX(-60px) scale(0.5);
+            }
+        }
+
+        .skill-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin-top: 0;
+        }
+
+        .skill-panel-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.45rem 0.8rem 0.3rem;
+        }
+
+        .skill-panel-header-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(0, 200, 255, 0.3), transparent);
+        }
+
+        .skill-panel-header-text {
+            font-size: 0.52rem;
+            letter-spacing: 0.28rem;
+            text-transform: uppercase;
+            color: rgba(0, 200, 255, 0.45);
+        }
+
+        .skill-btn {
+            width: 100%;
+            position: relative;
+            background: rgba(0, 180, 255, 0.03);
+            border: 1px solid rgba(0, 200, 255, 0.14);
+            border-radius: 4px;
+            padding: 0;
+            cursor: not-allowed;
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            transition: all 0.25s;
+            overflow: hidden;
+            min-height: 72px;
+        }
+
+        .skill-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .skill-btn.ready {
+            border-color: rgba(0, 200, 255, 0.6);
+            background: rgba(0, 180, 255, 0.07);
+            animation: skillReadyPulse 2.4s ease-in-out infinite;
+            cursor: pointer;
+        }
+
+        .skill-btn.ready:hover {
+            background: rgba(0, 180, 255, 0.12);
+            border-color: rgba(0, 200, 255, 0.95);
+        }
+
+        .skill-btn.activating {
+            animation: playbackActivate 0.45s ease-out forwards;
+        }
+
+        /* Left color strip */
+        .skill-btn-strip {
+            width: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            flex-shrink: 0;
+            transition: background 0.25s;
+        }
+
+        .skill-btn.ready .skill-btn-strip {
+            background: linear-gradient(180deg, #00c8ff 0%, #0055cc 100%);
+        }
+
+        /* Icon column */
+        .skill-btn-icon-wrap {
+            width: 60px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            border-right: 1px solid rgba(0, 200, 255, 0.08);
+            padding: 0.7rem 0;
+            position: relative;
+        }
+
+        /* Inline SVG rewind icon */
+        .skill-icon-svg {
+            width: 28px;
+            height: 28px;
+            opacity: 0.3;
+            transition: opacity 0.25s, filter 0.25s;
+        }
+
+        .skill-btn.ready .skill-icon-svg {
+            opacity: 1;
+            filter: drop-shadow(0 0 7px rgba(0, 200, 255, 0.8));
+        }
+
+        /* Cooldown arc (SVG) */
+        .skill-cd-svg {
+            position: absolute;
+            inset: 5px;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        .skill-cd-track {
+            fill: none;
+            stroke: rgba(0, 200, 255, 0.07);
+            stroke-width: 2;
+        }
+
+        .skill-cd-arc {
+            fill: none;
+            stroke: rgba(0, 200, 255, 0.55);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            transform-origin: 50% 50%;
+            transform: rotate(-90deg);
+            transition: stroke-dashoffset 0.35s ease;
+        }
+
+        /* Info column */
+        .skill-btn-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0.55rem 0.8rem;
+            gap: 3px;
+        }
+
+        .skill-btn-name {
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.14rem;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.3);
+            transition: color 0.25s;
+        }
+
+        .skill-btn.ready .skill-btn-name {
+            color: #00c8ff;
+        }
+
+        .skill-btn-desc {
+            font-size: 0.56rem;
+            color: rgba(255, 255, 255, 0.2);
+            letter-spacing: 0.04rem;
+            line-height: 1.45;
+            transition: color 0.25s;
+        }
+
+        .skill-btn.ready .skill-btn-desc {
+            color: rgba(0, 200, 255, 0.55);
+        }
+
+        /* Pip bar */
+        .skill-charges {
+            display: flex;
+            gap: 3px;
+            margin-top: 4px;
+        }
+
+        .charge-pip {
+            flex: 1;
+            height: 3px;
+            border-radius: 1px;
+            background: rgba(0, 200, 255, 0.1);
+            transition: all 0.3s;
+        }
+
+        .charge-pip.filled {
+            background: #00c8ff;
+            box-shadow: 0 0 5px rgba(0, 200, 255, 0.65);
+        }
+
+        /* READY badge */
+        .skill-ready-badge {
+            position: absolute;
+            top: 5px;
+            right: 7px;
+            font-size: 0.46rem;
+            letter-spacing: 0.2rem;
+            text-transform: uppercase;
+            color: #00c8ff;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .skill-btn.ready .skill-ready-badge {
+            opacity: 1;
+        }
+
+        /* Rewind VFX trail */
+        .rewind-trail {
+            position: fixed;
+            pointer-events: none;
+            z-index: 3000;
+            font-size: 2rem;
+            font-family: var(--chess-font);
+            color: #00ffff;
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.9);
+            animation: rewindPulse 0.6s ease-out forwards;
+        }
 
         /* START */
         #start-screen {
-            position: absolute; inset: 0;
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             z-index: 100;
             transition: opacity 0.6s ease;
         }
-        #start-screen.hidden { opacity:0; pointer-events:none; }
-        .start-inner { text-align:center; animation: fadeUp 1s ease-out; }
-        .title-wrap { margin-bottom: 2.5rem; }
+
+        #start-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .start-inner {
+            text-align: center;
+            animation: fadeUp 1s ease-out;
+        }
+
+        .title-wrap {
+            margin-bottom: 2.5rem;
+        }
+
         h1.title {
             font-family: 'Cormorant Garamond', serif;
             font-weight: 300;
@@ -74,190 +579,918 @@
             animation: shimmer 5s ease infinite;
             line-height: 1;
         }
-        .title-line { width:100%; height:1px; background: linear-gradient(90deg, transparent, var(--gem1), var(--gold), var(--gem3), transparent); margin:0.8rem 0 1.2rem; opacity:0.6; }
-        .subtitle { font-size:0.7rem; letter-spacing:0.4rem; color:var(--dim); text-transform:uppercase; }
-        .badges { display:flex; gap:0.8rem; justify-content:center; flex-wrap:wrap; margin-bottom:3rem; }
-        .badge { padding:0.35rem 1rem; font-size:0.62rem; letter-spacing:0.2rem; text-transform:uppercase; border-radius:2px; border:1px solid; }
-        .badge:nth-child(1) { border-color:rgba(0,212,170,0.3); color:var(--gem1); }
-        .badge:nth-child(2) { border-color:rgba(240,192,96,0.3); color:var(--gold); }
-        .badge:nth-child(3) { border-color:rgba(196,122,255,0.3); color:var(--gem3); }
-        .badge:nth-child(4) { border-color:rgba(0,119,255,0.3); color:var(--gem2); }
-        .start-btn {
-            padding:0.9rem 3.5rem; font-family:'DM Mono',monospace;
-            font-size:0.75rem; letter-spacing:0.3rem; text-transform:uppercase;
-            background:transparent; border:1px solid rgba(0,212,170,0.5);
-            color:var(--gem1); border-radius:2px; cursor:pointer;
-            position:relative; overflow:hidden; transition:all 0.3s;
+
+        .title-line {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gem1), var(--gold), var(--gem3), transparent);
+            margin: 0.8rem 0 1.2rem;
+            opacity: 0.6;
         }
-        .start-btn::before { content:''; position:absolute; inset:0; background:linear-gradient(90deg,var(--gem1),var(--gem2)); opacity:0; transition:opacity 0.3s; }
-        .start-btn:hover { color:#fff; border-color:var(--gem1); }
-        .start-btn:hover::before { opacity:0.15; }
-        .start-btn span { position:relative; z-index:1; }
+
+        .subtitle {
+            font-size: 0.7rem;
+            letter-spacing: 0.4rem;
+            color: var(--dim);
+            text-transform: uppercase;
+        }
+
+        .badges {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+        }
+
+        .badge {
+            padding: 0.35rem 1rem;
+            font-size: 0.62rem;
+            letter-spacing: 0.2rem;
+            text-transform: uppercase;
+            border-radius: 2px;
+            border: 1px solid;
+        }
+
+        .badge:nth-child(1) {
+            border-color: rgba(0, 212, 170, 0.3);
+            color: var(--gem1);
+        }
+
+        .badge:nth-child(2) {
+            border-color: rgba(240, 192, 96, 0.3);
+            color: var(--gold);
+        }
+
+        .badge:nth-child(3) {
+            border-color: rgba(196, 122, 255, 0.3);
+            color: var(--gem3);
+        }
+
+        .badge:nth-child(4) {
+            border-color: rgba(0, 119, 255, 0.3);
+            color: var(--gem2);
+        }
+
+        .start-btns {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+        }
+
+        .start-btn {
+            padding: 0.9rem 3.5rem;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 0.3rem;
+            text-transform: uppercase;
+            background: transparent;
+            border: 1px solid rgba(0, 212, 170, 0.5);
+            color: var(--gem1);
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .start-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, var(--gem1), var(--gem2));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .start-btn:hover {
+            color: #fff;
+            border-color: var(--gem1);
+        }
+
+        .start-btn:hover::before {
+            opacity: 0.15;
+        }
+
+        .start-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .raid-btn {
+            border-color: rgba(255, 0, 255, 0.5);
+            color: #ff44ff;
+        }
+
+        .raid-btn::before {
+            background: linear-gradient(90deg, #ff00ff, #7700ff);
+        }
+
+        .raid-btn:hover {
+            border-color: #ff00ff;
+            color: #fff;
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.4);
+        }
 
         /* GAME */
-        #game-screen { height:100%; width:100%; display:none; padding:1.2rem; flex-direction:column; justify-content:center; align-items:center; }
-        #game-screen.active { display:flex; }
-        .game-layout { display:grid; grid-template-columns:240px 1fr 240px; gap:1.5rem; width:100%; max-width:1500px; height:88vh; max-height:860px; }
-        .panel { display:flex; flex-direction:column; gap:0.8rem; height:100%; }
-        .player-card { background:var(--glass); border:1px solid var(--glass-b); border-radius:4px; padding:0.9rem 1rem; display:flex; align-items:center; gap:0.85rem; position:relative; overflow:hidden; }
-        .player-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--gem1),var(--gem2),var(--gem3)); opacity:0; transition:opacity 0.4s; }
-        .player-card.active-card::before { opacity:1; }
-        .avatar { width:36px; height:36px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:0.7rem; font-weight:500; flex-shrink:0; }
-        .avatar.ai-av { background:linear-gradient(135deg,#0d2a2a,#1a4a3a); border:1px solid rgba(0,212,170,0.3); color:var(--gem1); }
-        .avatar.me-av { background:linear-gradient(135deg,#2a200d,#4a3a1a); border:1px solid rgba(240,192,96,0.3); color:var(--gold); }
-        .p-name { font-size:0.8rem; font-weight:500; }
-        .p-status { font-size:0.62rem; color:var(--dim); letter-spacing:0.1rem; margin-top:2px; }
-        .p-status.live { color:var(--gem1); animation:pulse 1.5s infinite; }
+        #game-screen {
+            height: 100%;
+            width: 100%;
+            display: none;
+            padding: 1.2rem;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
 
-        .depth-bar { background:var(--glass); border:1px solid var(--glass-b); border-radius:4px; padding:0.7rem 0.9rem; }
-        .depth-label { font-size:0.58rem; letter-spacing:0.2rem; text-transform:uppercase; color:var(--dim); margin-bottom:0.5rem; }
-        .depth-track { height:3px; background:rgba(255,255,255,0.06); border-radius:2px; overflow:hidden; }
-        .depth-fill { height:100%; width:0%; background:linear-gradient(90deg,var(--gem1),var(--gem2)); border-radius:2px; transition:width 0.3s ease; }
-        .depth-nums { display:flex; justify-content:space-between; margin-top:0.4rem; }
-        .depth-cur { font-size:0.65rem; color:var(--gem1); }
-        .depth-max { font-size:0.65rem; color:var(--dim); }
+        #game-screen.active {
+            display: flex;
+        }
 
-        .log-box { flex:1; background:var(--glass); border:1px solid var(--glass-b); border-radius:4px; padding:0.9rem; display:flex; flex-direction:column; overflow:hidden; }
-        .log-title { font-size:0.6rem; letter-spacing:0.25rem; text-transform:uppercase; color:var(--dim); margin-bottom:0.6rem; }
-        #moves-list { flex:1; overflow-y:auto; scrollbar-width:thin; scrollbar-color:#222 transparent; }
-        .move-row { display:grid; grid-template-columns:28px 1fr 1fr; padding:0.3rem 0; font-size:0.72rem; color:var(--dim); border-bottom:1px solid rgba(255,255,255,0.04); }
-        .move-row span:first-child { color:#333; }
+        .game-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr 240px;
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 1500px;
+            height: 88vh;
+            max-height: 860px;
+        }
 
-        .cap-box { background:var(--glass); border:1px solid var(--glass-b); border-radius:4px; padding:0.7rem; flex:1; display:flex; flex-wrap:wrap; align-content:flex-start; gap:2px; font-family:var(--chess-font); font-size:1.3rem; }
-        .cap-label { width:100%; font-size:0.58rem; letter-spacing:0.2rem; text-transform:uppercase; color:var(--dim); margin-bottom:0.3rem; font-family:'DM Mono',monospace; }
+        .panel {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            height: 100%;
+        }
+
+        .player-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-b);
+            border-radius: 4px;
+            padding: 0.9rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .player-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--gem1), var(--gem2), var(--gem3));
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .player-card.active-card::before {
+            opacity: 1;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.7rem;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .avatar.ai-av {
+            background: linear-gradient(135deg, #0d2a2a, #1a4a3a);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            color: var(--gem1);
+        }
+
+        .avatar.me-av {
+            background: linear-gradient(135deg, #2a200d, #4a3a1a);
+            border: 1px solid rgba(240, 192, 96, 0.3);
+            color: var(--gold);
+        }
+
+        body.raid-mode .avatar.ai-av {
+            background: linear-gradient(135deg, #2a0030, #4a0050);
+            border: 1px solid rgba(255, 0, 255, 0.5);
+            color: #ff00ff;
+        }
+
+        .p-name {
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .p-status {
+            font-size: 0.62rem;
+            color: var(--dim);
+            letter-spacing: 0.1rem;
+            margin-top: 2px;
+        }
+
+        .p-status.live {
+            color: var(--gem1);
+            animation: pulse 1.5s infinite;
+        }
+
+        .depth-bar {
+            background: var(--glass);
+            border: 1px solid var(--glass-b);
+            border-radius: 4px;
+            padding: 0.7rem 0.9rem;
+        }
+
+        .depth-label {
+            font-size: 0.58rem;
+            letter-spacing: 0.2rem;
+            text-transform: uppercase;
+            color: var(--dim);
+            margin-bottom: 0.5rem;
+        }
+
+        .depth-track {
+            height: 3px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .depth-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--gem1), var(--gem2));
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .depth-nums {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.4rem;
+        }
+
+        .depth-cur {
+            font-size: 0.65rem;
+            color: var(--gem1);
+        }
+
+        .depth-max {
+            font-size: 0.65rem;
+            color: var(--dim);
+        }
+
+        .log-box {
+            flex: 1;
+            min-height: 0;
+            background: var(--glass);
+            border: 1px solid var(--glass-b);
+            border-radius: 4px;
+            padding: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .log-title {
+            font-size: 0.6rem;
+            letter-spacing: 0.25rem;
+            text-transform: uppercase;
+            color: var(--dim);
+            margin-bottom: 0.6rem;
+        }
+
+        #moves-list {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #222 transparent;
+        }
+
+        .move-row {
+            display: grid;
+            grid-template-columns: 28px 1fr 1fr;
+            padding: 0.3rem 0;
+            font-size: 0.72rem;
+            color: var(--dim);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .move-row span:first-child {
+            color: #333;
+        }
+
+        .cap-box {
+            background: var(--glass);
+            border: 1px solid var(--glass-b);
+            border-radius: 4px;
+            padding: 0.7rem;
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            overflow-y: auto;
+            gap: 2px;
+            font-family: var(--chess-font);
+            font-size: 1.3rem;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+        }
+
+        .cap-label {
+            width: 100%;
+            font-size: 0.58rem;
+            letter-spacing: 0.2rem;
+            text-transform: uppercase;
+            color: var(--dim);
+            margin-bottom: 0.3rem;
+            font-family: 'DM Mono', monospace;
+        }
 
         /* BOARD */
-        .board-wrap { position:relative; display:flex; justify-content:center; align-items:center; }
-        .board-wrap::before { content:''; position:absolute; width:calc(min(80vh,80vw) + 60px); height:calc(min(80vh,80vw) + 60px); border-radius:12px; background:radial-gradient(ellipse at 30% 30%,rgba(0,212,170,0.12),transparent 60%),radial-gradient(ellipse at 70% 70%,rgba(196,122,255,0.1),transparent 60%); filter:blur(20px); pointer-events:none; }
-        #chess-board { display:grid; grid-template-columns:repeat(8,1fr); grid-template-rows:repeat(8,1fr); width:min(80vh,80vw); height:min(80vh,80vw); border:8px solid #1a2235; border-radius:6px; box-shadow:0 0 0 1px rgba(0,212,170,0.15),0 40px 80px -10px rgba(0,0,0,0.9),0 0 60px -10px rgba(0,212,170,0.08); overflow:hidden; position:relative; z-index:1; }
-        .sq { position:relative; width:100%; height:100%; display:flex; justify-content:center; align-items:center; font-size:min(7.5vh,7.5vw); cursor:pointer; font-family:var(--chess-font); overflow:hidden; line-height:0; transition:background-color 0.12s; box-sizing:border-box; }
-        .sq.light { background:var(--board-l); }
-        .sq.dark { background:var(--board-d); }
-        .sq.selected { background:rgba(0,212,170,0.6) !important; }
-        .sq.last-from { background:rgba(240,192,96,0.25) !important; }
-        .sq.last-to { background:rgba(240,192,96,0.45) !important; }
-        .sq[data-color="w"] { color:#fff; text-shadow:0 1px 4px rgba(0,0,0,0.9),0 0 2px rgba(0,0,0,0.8); }
-        .sq[data-color="b"] { color:#0d1520; text-shadow:0 1px 3px rgba(255,255,255,0.25); }
-        .sq.valid::after { content:''; position:absolute; width:30%; height:30%; background:radial-gradient(circle,rgba(0,212,170,0.55),rgba(0,212,170,0.1)); border-radius:50%; pointer-events:none; z-index:10; }
-        .sq.capture-hint::after { content:''; position:absolute; inset:3px; border:3px solid rgba(0,212,170,0.5); border-radius:50%; pointer-events:none; z-index:10; }
+        .board-wrap {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .board-wrap::before {
+            content: '';
+            position: absolute;
+            width: calc(min(80vh, 80vw) + 60px);
+            height: calc(min(80vh, 80vw) + 60px);
+            border-radius: 12px;
+            background: radial-gradient(ellipse at 30% 30%, rgba(0, 212, 170, 0.12), transparent 60%), radial-gradient(ellipse at 70% 70%, rgba(196, 122, 255, 0.1), transparent 60%);
+            filter: blur(20px);
+            pointer-events: none;
+            transition: background 0.8s;
+        }
+
+        body.raid-mode .board-wrap::before {
+            background: radial-gradient(ellipse at 30% 30%, rgba(255, 0, 255, 0.2), transparent 55%), radial-gradient(ellipse at 70% 70%, rgba(170, 0, 255, 0.2), transparent 55%), radial-gradient(ellipse at 50% 50%, rgba(0, 255, 255, 0.1), transparent 65%);
+        }
+
+        #chess-board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            width: min(80vh, 80vw);
+            height: min(80vh, 80vw);
+            border: 8px solid #1a2235;
+            border-radius: 6px;
+            box-shadow: 0 0 0 1px rgba(0, 212, 170, 0.15), 0 40px 80px -10px rgba(0, 0, 0, 0.9), 0 0 60px -10px rgba(0, 212, 170, 0.08);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            transition: border-color 0.5s, box-shadow 0.5s;
+        }
+
+        body.raid-mode #chess-board {
+            border-color: #330044;
+            box-shadow: 0 0 0 2px rgba(255, 0, 255, 0.3), 0 40px 80px -10px rgba(0, 0, 0, 0.95), 0 0 80px -10px rgba(255, 0, 255, 0.2);
+            animation: raidPulse 2s ease-in-out infinite;
+        }
+
+        #chess-board.shake {
+            animation: boardShake 0.4s ease-out;
+        }
+
+        .sq {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: min(7.5vh, 7.5vw);
+            cursor: pointer;
+            font-family: var(--chess-font);
+            overflow: hidden;
+            line-height: 0;
+            transition: background-color 0.12s;
+            box-sizing: border-box;
+        }
+
+        .sq.light {
+            background: var(--board-l);
+        }
+
+        .sq.dark {
+            background: var(--board-d);
+        }
+
+        .sq.selected {
+            background: rgba(0, 212, 170, 0.6) !important;
+        }
+
+        body.raid-mode .sq.selected {
+            background: rgba(255, 0, 255, 0.5) !important;
+        }
+
+        .sq.last-from {
+            background: rgba(240, 192, 96, 0.25) !important;
+        }
+
+        .sq.last-to {
+            background: rgba(240, 192, 96, 0.45) !important;
+        }
+
+        body.raid-mode .sq.last-from {
+            background: rgba(255, 0, 255, 0.15) !important;
+        }
+
+        body.raid-mode .sq.last-to {
+            background: rgba(255, 0, 255, 0.4) !important;
+        }
+
+        .sq.flash-bad {
+            animation: flashRed 0.5s ease-out;
+        }
+
+        .sq.flash-good {
+            animation: flashGreen 0.5s ease-out;
+        }
+
+        .sq[data-color="w"] {
+            color: #fff;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .sq[data-color="b"] {
+            color: #0d1520;
+            text-shadow: 0 1px 3px rgba(255, 255, 255, 0.25);
+        }
+
+        body.raid-mode .sq[data-color="b"] {
+            color: #1a0030;
+        }
+
+        .sq.valid::after {
+            content: '';
+            position: absolute;
+            width: 30%;
+            height: 30%;
+            background: radial-gradient(circle, rgba(0, 212, 170, 0.55), rgba(0, 212, 170, 0.1));
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        body.raid-mode .sq.valid::after {
+            background: radial-gradient(circle, rgba(255, 0, 255, 0.6), rgba(255, 0, 255, 0.1));
+        }
+
+        .sq.capture-hint::after {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            border: 3px solid rgba(0, 212, 170, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        body.raid-mode .sq.capture-hint::after {
+            border-color: rgba(255, 0, 255, 0.7);
+        }
 
         /* OVERLAY */
-        #game-overlay { position:absolute; inset:0; background:rgba(0,0,0,0.88); backdrop-filter:blur(12px); display:flex; justify-content:center; align-items:center; z-index:50; transition:opacity 0.4s; border-radius:6px; }
-        #game-overlay.hidden { opacity:0; pointer-events:none; }
-        .over-content { text-align:center; }
-        .over-content h2 { font-family:'Cormorant Garamond',serif; font-size:4rem; font-weight:300; letter-spacing:0.5rem; background:linear-gradient(135deg,var(--gem1),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-        .over-content p { color:var(--dim); font-size:0.7rem; letter-spacing:0.3rem; text-transform:uppercase; margin-top:0.5rem; }
-        .restart-btn { margin-top:2rem; padding:0.7rem 2.5rem; background:transparent; border:1px solid rgba(0,212,170,0.4); color:var(--gem1); border-radius:2px; cursor:pointer; font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.3rem; text-transform:uppercase; transition:0.3s; }
-        .restart-btn:hover { background:rgba(0,212,170,0.1); }
+        #game-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+            transition: opacity 0.4s;
+            border-radius: 6px;
+        }
 
-        .think-spinner { display:inline-block; width:10px; height:10px; border:1.5px solid rgba(0,212,170,0.3); border-top-color:var(--gem1); border-radius:50%; animation:spin 0.8s linear infinite; margin-right:6px; vertical-align:middle; }
+        #game-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
 
-        #promo-modal { position:fixed; inset:0; background:rgba(0,0,0,0.92); display:flex; justify-content:center; align-items:center; z-index:3000; }
-        #promo-modal.hidden { display:none !important; }
-        .promo-box { background:#0d1220; padding:2rem 2.5rem; border-radius:6px; border:1px solid rgba(0,212,170,0.3); box-shadow:0 0 40px rgba(0,212,170,0.1); text-align:center; }
-        .promo-box h3 { font-size:0.65rem; letter-spacing:0.3rem; text-transform:uppercase; color:var(--dim); margin-bottom:1.5rem; }
-        .promo-opts { display:flex; gap:1.2rem; }
-        .promo-opt { font-size:3.5rem; padding:0.4rem; cursor:pointer; font-family:var(--chess-font); transition:0.2s; color:#fff; }
-        .promo-opt:hover { transform:scale(1.2); color:var(--gem1); }
+        .over-content {
+            text-align: center;
+        }
 
-        @media (max-width: 1100px) {
-            .game-layout { grid-template-columns:1fr; grid-template-rows:auto auto 1fr auto; height:auto; max-height:none; gap:0.8rem; }
-            #chess-board { width:92vw; height:92vw; }
-            .log-box { display:none; }
-            .panel { flex-direction:row; justify-content:space-between; width:100%; }
-            .cap-box { max-height:80px; }
+        .over-content h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 4rem;
+            font-weight: 300;
+            letter-spacing: 0.5rem;
+            background: linear-gradient(135deg, var(--gem1), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .over-content p {
+            color: var(--dim);
+            font-size: 0.7rem;
+            letter-spacing: 0.3rem;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+        }
+
+        .restart-btn {
+            margin-top: 2rem;
+            padding: 0.7rem 2.5rem;
+            background: transparent;
+            border: 1px solid rgba(0, 212, 170, 0.4);
+            color: var(--gem1);
+            border-radius: 2px;
+            cursor: pointer;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.3rem;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        .restart-btn:hover {
+            background: rgba(0, 212, 170, 0.1);
+        }
+
+        .think-spinner {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border: 1.5px solid rgba(0, 212, 170, 0.3);
+            border-top-color: var(--gem1);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+
+        /* PROMO */
+        #promo-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.92);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+        }
+
+        #promo-modal.hidden {
+            display: none !important;
+        }
+
+        .promo-box {
+            background: #0d1220;
+            padding: 2rem 2.5rem;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            box-shadow: 0 0 40px rgba(0, 212, 170, 0.1);
+            text-align: center;
+        }
+
+        .promo-box h3 {
+            font-size: 0.65rem;
+            letter-spacing: 0.3rem;
+            text-transform: uppercase;
+            color: var(--dim);
+            margin-bottom: 1.5rem;
+        }
+
+        .promo-opts {
+            display: flex;
+            gap: 1.2rem;
+        }
+
+        .promo-opt {
+            font-size: 3.5rem;
+            padding: 0.4rem;
+            cursor: pointer;
+            font-family: var(--chess-font);
+            transition: 0.2s;
+            color: #fff;
+        }
+
+        .promo-opt:hover {
+            transform: scale(1.2);
+            color: var(--gem1);
+        }
+
+        /* RAID LAYER */
+        #raid-layer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 2000;
+            overflow: hidden;
+        }
+
+        #raid-scan {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(255, 0, 255, 0.8), transparent);
+            top: 0;
+            animation: raidScan 4s linear infinite;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        body.raid-mode #raid-scan {
+            opacity: 1;
+        }
+
+        .floating-comment {
+            position: absolute;
+            white-space: nowrap;
+            font-family: 'DM Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: 600;
+            pointer-events: none;
+            opacity: 0.9;
+        }
+
+        .fc-normal {
+            color: #ffffff;
+            text-shadow: 0 0 8px rgba(0, 0, 0, 1), 2px 2px 0 #000, -1px -1px 0 #000;
+        }
+
+        .fc-rare {
+            color: #00ffff;
+            font-size: 1.8rem;
+            text-shadow: 0 0 12px rgba(0, 255, 255, 0.8), 2px 2px 0 #000;
+        }
+
+        .fc-danger {
+            color: #ff00ff;
+            text-shadow: 0 0 12px rgba(255, 0, 255, 0.8), 2px 2px 0 #000;
+        }
+
+        .fc-mega {
+            color: #ffff00;
+            font-size: 2.4rem;
+            text-shadow: 0 0 20px rgba(255, 255, 0, 0.9), 3px 3px 0 #000, -1px -1px 0 #444;
+        }
+
+        .fc-god {
+            color: #ff8800;
+            font-size: 2.8rem;
+            text-shadow: 0 0 25px rgba(255, 136, 0, 1), 0 0 50px rgba(255, 0, 0, 0.5), 3px 3px 0 #000;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleFly 0.8s ease-out forwards;
+        }
+
+        #board-flash {
+            position: absolute;
+            inset: 0;
+            z-index: 20;
+            pointer-events: none;
+            border-radius: 0;
+            opacity: 0;
+            transition: opacity 0.1s;
+        }
+
+        #combo-display {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2100;
+            pointer-events: none;
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 700;
+            font-size: 2.5rem;
+            letter-spacing: 0.2rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            text-align: center;
+        }
+
+        body.raid-mode #combo-display {
+            opacity: 1;
+        }
+
+        #raid-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 2500;
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 80px;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        #raid-banner-inner {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 400;
+            letter-spacing: 0.5rem;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #ff00ff, #00ffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @media (max-width:1100px) {
+            .game-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr auto;
+                height: auto;
+                max-height: none;
+                gap: 0.8rem;
+            }
+
+            #chess-board {
+                width: 92vw;
+                height: 92vw;
+            }
+
+            .log-box {
+                display: none;
+            }
+
+            .panel {
+                flex-direction: row;
+                justify-content: space-between;
+                width: 100%;
+            }
+
+            .cap-box {
+                max-height: 80px;
+            }
         }
     </style>
 </head>
+
 <body>
-<div id="app">
-    <section id="start-screen">
-        <div class="start-inner">
-            <div class="title-wrap">
-                <h1 class="title">CHESS</h1>
-                <div class="title-line"></div>
-                <p class="subtitle">Against the Machine</p>
+    <div id="app">
+        <!-- START -->
+        <section id="start-screen">
+            <div class="start-inner">
+                <div class="title-wrap">
+                    <h1 class="title">CHESS</h1>
+                    <div class="title-line"></div>
+                    <p class="subtitle">Against the Machine</p>
+                </div>
+                <div class="badges">
+                    <span class="badge">Iterative Deepening</span>
+                    <span class="badge">Transposition Table</span>
+                    <span class="badge">Quiescence Search</span>
+                    <span class="badge">Null Move Pruning</span>
+                </div>
+                <div class="start-btns">
+                    <button class="start-btn" id="start-btn"><span>BEGIN GAME</span></button>
+                    <button class="start-btn raid-btn" id="raid-btn"><span>RAID MODE</span></button>
+                </div>
             </div>
-            <div class="badges">
-                <span class="badge">Iterative Deepening</span>
-                <span class="badge">Transposition Table</span>
-                <span class="badge">Quiescence Search</span>
-                <span class="badge">Null Move Pruning</span>
-            </div>
-            <button class="start-btn" id="start-btn"><span>BEGIN GAME</span></button>
-        </div>
-    </section>
+        </section>
 
-    <section id="game-screen">
-        <div class="game-layout">
-            <div class="panel" id="left-panel">
-                <div class="player-card" id="ai-card">
-                    <div class="avatar ai-av">AI</div>
-                    <div>
-                        <div class="p-name">Grandmaster AI</div>
-                        <div class="p-status" id="ai-status">—</div>
+        <!-- GAME -->
+        <section id="game-screen">
+            <div class="game-layout">
+                <div class="panel" id="left-panel">
+                    <div class="player-card" id="ai-card">
+                        <div class="avatar ai-av" id="ai-avatar">AI</div>
+                        <div>
+                            <div class="p-name" id="ai-name">Grandmaster AI</div>
+                            <div class="p-status" id="ai-status">—</div>
+                        </div>
+                    </div>
+                    <div class="depth-bar">
+                        <div class="depth-label">Search Depth</div>
+                        <div class="depth-track">
+                            <div class="depth-fill" id="depth-fill"></div>
+                        </div>
+                        <div class="depth-nums">
+                            <span class="depth-cur" id="depth-cur">—</span>
+                            <span class="depth-max" id="depth-elapsed">—</span>
+                        </div>
+                    </div>
+                    <div class="log-box">
+                        <div class="log-title">Move Log</div>
+                        <div id="moves-list"></div>
                     </div>
                 </div>
-                <div class="depth-bar">
-                    <div class="depth-label">Search Depth</div>
-                    <div class="depth-track"><div class="depth-fill" id="depth-fill"></div></div>
-                    <div class="depth-nums">
-                        <span class="depth-cur" id="depth-cur">—</span>
-                        <span class="depth-max" id="depth-elapsed">—</span>
+
+                <div class="board-wrap" id="board-wrap">
+                    <div id="chess-board"></div>
+                    <div id="board-flash"></div>
+                    <div id="game-overlay" class="hidden">
+                        <div class="over-content">
+                            <h2 id="end-msg">DRAW</h2>
+                            <p id="end-sub">—</p>
+                            <button class="restart-btn" id="restart-btn">NEW GAME</button>
+                        </div>
                     </div>
                 </div>
-                <div class="log-box">
-                    <div class="log-title">Move Log</div>
-                    <div id="moves-list"></div>
-                </div>
-            </div>
 
-            <div class="board-wrap">
-                <div id="chess-board"></div>
-                <div id="game-overlay" class="hidden">
-                    <div class="over-content">
-                        <h2 id="end-msg">DRAW</h2>
-                        <p id="end-sub">—</p>
-                        <button class="restart-btn" id="restart-btn">NEW GAME</button>
+                <div class="panel" id="right-panel">
+                    <div class="player-card active-card" id="me-card">
+                        <div class="avatar me-av">ME</div>
+                        <div>
+                            <div class="p-name">Player (White)</div>
+                            <div class="p-status live" id="me-status">Your Turn</div>
+                        </div>
+                    </div>
+                    <!-- SKILL BUTTONS (Raid Mode only) -->
+                    <div class="skill-row" id="skill-row" style="display:none;">
+                        <div class="skill-panel-header">
+                            <span class="skill-panel-header-text">Skills</span>
+                            <div class="skill-panel-header-line"></div>
+                        </div>
+                        <button class="skill-btn" id="playback-btn" disabled
+                            title="Rewind 1 turn (available after 3 turns, 5 turn cooldown)">
+                            <div class="skill-btn-strip"></div>
+                            <div class="skill-btn-icon-wrap">
+                                <!-- Rewind SVG icon -->
+                                <svg class="skill-icon-svg" viewBox="0 0 28 28" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M14 5C9 5 5 9 5 14s4 9 9 9 9-4 9-9" stroke="#00c8ff" stroke-width="2"
+                                        stroke-linecap="round" />
+                                    <path d="M18 5l-4-3v6l4-3z" fill="#00c8ff" />
+                                    <path d="M11 11l-3 3 3 3M8 14h8" stroke="#00c8ff" stroke-width="1.8"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <!-- Cooldown arc SVG -->
+                                <svg class="skill-cd-svg" viewBox="0 0 50 50">
+                                    <circle class="skill-cd-track" cx="25" cy="25" r="15.9" />
+                                    <circle class="skill-cd-arc" id="playback-arc" cx="25" cy="25" r="15.9" />
+                                </svg>
+                            </div>
+                            <div class="skill-btn-info">
+                                <span class="skill-btn-name">Playback</span>
+                                <span class="skill-btn-desc" id="playback-label">Rewind 1 turn</span>
+                                <div class="skill-charges">
+                                    <div class="charge-pip" id="pip0"></div>
+                                    <div class="charge-pip" id="pip1"></div>
+                                    <div class="charge-pip" id="pip2"></div>
+                                    <div class="charge-pip" id="pip3"></div>
+                                    <div class="charge-pip" id="pip4"></div>
+                                </div>
+                            </div>
+                            <span class="skill-ready-badge">Ready</span>
+                        </button>
+                    </div>
+                    <div class="cap-box" id="white-cap">
+                        <div class="cap-label">Captured by you</div>
+                    </div>
+                    <div class="cap-box" id="black-cap">
+                        <div class="cap-label">Captured by AI</div>
                     </div>
                 </div>
             </div>
+        </section>
+    </div>
 
-            <div class="panel" id="right-panel">
-                <div class="player-card active-card" id="me-card">
-                    <div class="avatar me-av">ME</div>
-                    <div>
-                        <div class="p-name">Player (White)</div>
-                        <div class="p-status live" id="me-status">Your Turn</div>
-                    </div>
-                </div>
-                <div class="cap-box" id="white-cap"><div class="cap-label">Captured by you</div></div>
-                <div class="cap-box" id="black-cap"><div class="cap-label">Captured by AI</div></div>
+    <!-- RAID LAYER -->
+    <div id="raid-layer">
+        <div id="raid-scan"></div>
+    </div>
+    <div id="combo-display"></div>
+    <div id="raid-banner">
+        <div id="raid-banner-inner"></div>
+    </div>
+
+    <!-- PROMO -->
+    <div id="promo-modal" class="hidden">
+        <div class="promo-box">
+            <h3>Promote Pawn</h3>
+            <div class="promo-opts">
+                <div class="promo-opt" data-p="q">&#9819;</div>
+                <div class="promo-opt" data-p="r">&#9820;</div>
+                <div class="promo-opt" data-p="b">&#9821;</div>
+                <div class="promo-opt" data-p="n">&#9822;</div>
             </div>
-        </div>
-    </section>
-</div>
-
-<div id="promo-modal" class="hidden">
-    <div class="promo-box">
-        <h3>Promote Pawn</h3>
-        <div class="promo-opts">
-            <div class="promo-opt" data-p="q">&#9819;</div>
-            <div class="promo-opt" data-p="r">&#9820;</div>
-            <div class="promo-opt" data-p="b">&#9821;</div>
-            <div class="promo-opt" data-p="n">&#9822;</div>
         </div>
     </div>
-</div>
 
-<script id="worker-src" type="text/plain">
+    <!-- WORKER SOURCE -->
+    <script id="worker-src" type="text/plain">
 'use strict';
-/* ══════════════════════════════════
-   GAME ENGINE (runs in Web Worker)
-══════════════════════════════════ */
 class Game {
-    constructor() { this.reset(); }
-    reset() {
+    constructor(){this.reset();}
+    reset(){
         this.board=['r','n','b','q','k','b','n','r','p','p','p','p','p','p','p','p',null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,'P','P','P','P','P','P','P','P','R','N','B','Q','K','B','N','R'];
         this.turn='w';this.castle={w:{k:true,q:true},b:{k:true,q:true}};this.ep=null;this.half=0;this.full=1;
     }
@@ -267,8 +1500,7 @@ class Game {
     moves(i,noCheck=false){
         const p=this.board[i];if(!p)return[];
         const c=this.col(i);if(!noCheck&&c!==this.turn)return[];
-        const ms=this.pseudo(i);
-        if(noCheck)return ms;
+        const ms=this.pseudo(i);if(noCheck)return ms;
         return ms.filter(m=>{const t=this.copy();t.applyRaw(m);return!t.inCheck(c);});
     }
     pseudo(i,atkOnly=false){
@@ -314,22 +1546,18 @@ class Game {
     allMoves(c){let ms=[];for(let i=0;i<64;i++)if(this.col(i)===c)ms=ms.concat(this.moves(i));return ms;}
     copy(){const g=new Game();g.board=[...this.board];g.turn=this.turn;g.castle={w:{...this.castle.w},b:{...this.castle.b}};g.ep=this.ep;g.half=this.half;g.full=this.full;return g;}
 }
-
-/* ── Zobrist ── */
-const ZR=[];const ZS=Math.random()*2**32>>>0;const ZC=[0,0,0,0].map(()=>Math.random()*2**32>>>0);const ZE=[];
+const ZR={};const ZS=Math.random()*2**32>>>0;const ZC=[0,0,0,0].map(()=>Math.random()*2**32>>>0);const ZE=[];
 'PNBRQKpnbrqk'.split('').forEach(p=>{ZR[p]=[];for(let i=0;i<64;i++)ZR[p][i]=Math.random()*2**32>>>0;});
 for(let i=0;i<8;i++)ZE[i]=Math.random()*2**32>>>0;
 function hash(g){let h=0;for(let i=0;i<64;i++){const p=g.board[i];if(p)h^=ZR[p][i];}if(g.turn==='b')h^=ZS;if(g.castle.w.k)h^=ZC[0];if(g.castle.w.q)h^=ZC[1];if(g.castle.b.k)h^=ZC[2];if(g.castle.b.q)h^=ZC[3];if(g.ep!==null)h^=ZE[g.ep%8];return h;}
-
-/* ── Transposition Table ── */
-const TT_SZ=1<<22;
-const TT=new Array(TT_SZ);
-const EXACT=0,LOWER=1,UPPER=2;
+const TT_SZ=1<<22;const TT=new Array(TT_SZ);const EXACT=0,LOWER=1,UPPER=2;
 function ttGet(h){const e=TT[h&(TT_SZ-1)];return(e&&e.h===h)?e:null;}
 function ttSet(h,d,s,f,m){TT[h&(TT_SZ-1)]={h,d,s,f,m};}
 
-/* ── Eval tables ── */
-const MAT={p:100,n:320,b:340,r:500,q:975,k:20000};
+/* ═══ ENHANCED EVALUATION (Stronger AI) ═══ */
+const MAT={p:100,n:325,b:350,r:525,q:1000,k:20000};
+/* Passed pawn bonus by rank */
+const PASSED_BONUS=[0,10,20,30,50,75,100,0];
 const PST_P=[0,0,0,0,0,0,0,0,50,50,50,50,50,50,50,50,10,10,20,30,30,20,10,10,5,5,10,25,25,10,5,5,0,0,0,20,20,0,0,0,5,-5,-10,0,0,-10,-5,5,5,10,10,-20,-20,10,10,5,0,0,0,0,0,0,0,0];
 const PST_N=[-50,-40,-30,-30,-30,-30,-40,-50,-40,-20,0,0,0,0,-20,-40,-30,0,10,15,15,10,0,-30,-30,5,15,20,20,15,5,-30,-30,0,15,20,20,15,0,-30,-30,5,10,15,15,10,5,-30,-40,-20,0,5,5,0,-20,-40,-50,-40,-30,-30,-30,-30,-40,-50];
 const PST_B=[-20,-10,-10,-10,-10,-10,-10,-20,-10,0,0,0,0,0,0,-10,-10,0,5,10,10,5,0,-10,-10,5,5,10,10,5,5,-10,-10,0,10,10,10,10,0,-10,-10,10,10,10,10,10,10,-10,-10,5,0,0,0,0,5,-10,-20,-10,-10,-10,-10,-10,-10,-20];
@@ -337,330 +1565,718 @@ const PST_R=[0,0,0,0,0,0,0,0,5,10,10,10,10,10,10,5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,
 const PST_Q=[-20,-10,-10,-5,-5,-10,-10,-20,-10,0,0,0,0,0,0,-10,-10,0,5,5,5,5,0,-10,-5,0,5,5,5,5,0,-5,0,0,5,5,5,5,0,-5,-10,5,5,5,5,5,0,-10,-10,0,5,0,0,0,0,-10,-20,-10,-10,-5,-5,-10,-10,-20];
 const PST_KM=[-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-20,-30,-30,-40,-40,-30,-30,-20,-10,-20,-20,-20,-20,-20,-20,-10,20,20,0,0,0,0,20,20,20,30,10,0,0,10,30,20];
 const PST_KE=[-50,-40,-30,-20,-20,-30,-40,-50,-30,-20,-10,0,0,-10,-20,-30,-30,-10,20,30,30,20,-10,-30,-30,-10,30,40,40,30,-10,-30,-30,-10,30,40,40,30,-10,-30,-30,-10,20,30,30,20,-10,-30,-30,-30,0,0,0,0,-30,-30,-50,-30,-30,-30,-30,-30,-30,-50];
+const KM=new Int32Array(256),HT=new Int32Array(64*64);
 
-function isEndgame(board){let q=0,m=0;for(let i=0;i<64;i++){const p=board[i];if(!p)continue;const pl=p.toLowerCase();if(pl==='q')q++;if(pl==='n'||pl==='b'||pl==='r')m++;}return q===0||(q===2&&m<=2);}
+function countMaterial(g){
+    let mat=0;
+    for(let i=0;i<64;i++){const p=g.board[i];if(p&&p.toLowerCase()!=='k')mat+=MAT[p.toLowerCase()];}
+    return mat;
+}
 
 function evaluate(g){
-    const eg=isEndgame(g.board);
+    const totalMat=countMaterial(g);
+    const eg=totalMat<2600; /* endgame threshold */
     let s=0;
+    /* Piece/pawn files for structure analysis */
+    const wPawnFiles=new Array(8).fill(0);
+    const bPawnFiles=new Array(8).fill(0);
     for(let i=0;i<64;i++){
         const p=g.board[i];if(!p)continue;
         const pl=p.toLowerCase(),isW=(p===p.toUpperCase()),sign=isW?-1:1;
         const r=Math.floor(i/8),c=i%8,pi=isW?(7-r)*8+c:r*8+c;
         let v=MAT[pl];
-        if(pl==='p')v+=PST_P[pi];else if(pl==='n')v+=PST_N[pi];else if(pl==='b')v+=PST_B[pi];else if(pl==='r')v+=PST_R[pi];else if(pl==='q')v+=PST_Q[pi];else if(pl==='k')v+=(eg?PST_KE:PST_KM)[pi];
+        if(pl==='p'){v+=PST_P[pi];if(isW)wPawnFiles[c]++;else bPawnFiles[c]++;}
+        else if(pl==='n')v+=PST_N[pi];
+        else if(pl==='b')v+=PST_B[pi];
+        else if(pl==='r')v+=PST_R[pi];
+        else if(pl==='q')v+=PST_Q[pi];
+        else if(pl==='k')v+=(eg?PST_KE:PST_KM)[pi];
+        if((i===27||i===28||i===35||i===36))v+=12;
         s+=sign*v;
     }
-    if(g.board.filter(p=>p==='B').length>=2)s-=30;
-    if(g.board.filter(p=>p==='b').length>=2)s+=30;
+    /* Bishop pair */
+    if(g.board.filter(p=>p==='B').length>=2)s-=35;
+    if(g.board.filter(p=>p==='b').length>=2)s+=35;
+    /* Doubled/isolated pawns */
+    for(let c=0;c<8;c++){
+        if(wPawnFiles[c]>1)s+=(wPawnFiles[c]-1)*20;
+        if(bPawnFiles[c]>1)s-=(bPawnFiles[c]-1)*20;
+        const wIso=(c===0||wPawnFiles[c-1]===0)&&(c===7||wPawnFiles[c+1]===0);
+        const bIso=(c===0||bPawnFiles[c-1]===0)&&(c===7||bPawnFiles[c+1]===0);
+        if(wPawnFiles[c]>0&&wIso)s+=15;
+        if(bPawnFiles[c]>0&&bIso)s-=15;
+    }
+    /* Passed pawn detection */
+    for(let i=0;i<64;i++){
+        const p=g.board[i];if(!p||p.toLowerCase()!=='p')continue;
+        const isW=(p==='P'),r=Math.floor(i/8),c=i%8;
+        let passed=true;
+        if(isW){
+            for(let rr=r-1;rr>=0;rr--){
+                for(let cc=c-1;cc<=c+1;cc++){
+                    if(cc<0||cc>7)continue;
+                    if(g.board[rr*8+cc]==='p'){passed=false;break;}
+                }
+                if(!passed)break;
+            }
+            if(passed)s-=PASSED_BONUS[r]; /* closer to promo = lower row index */
+        }else{
+            for(let rr=r+1;rr<=7;rr++){
+                for(let cc=c-1;cc<=c+1;cc++){
+                    if(cc<0||cc>7)continue;
+                    if(g.board[rr*8+cc]==='P'){passed=false;break;}
+                }
+                if(!passed)break;
+            }
+            if(passed)s+=PASSED_BONUS[7-r];
+        }
+    }
+    /* Rook on open/semi-open file */
+    for(let i=0;i<64;i++){
+        const p=g.board[i];if(!p)continue;
+        const c=i%8;
+        if(p==='R'){if(wPawnFiles[c]===0)s-=(bPawnFiles[c]===0?25:15);}
+        if(p==='r'){if(bPawnFiles[c]===0)s+=(wPawnFiles[c]===0?25:15);}
+    }
+    /* King safety (pawn shield bonus in middlegame) */
+    if(!eg){
+        const wk=g.board.indexOf('K');const bk=g.board.indexOf('k');
+        if(wk>=0){const kr=Math.floor(wk/8),kc=wk%8;
+            for(const dc of[-1,0,1]){const sc=kc+dc;if(sc>=0&&sc<8){if(g.board[(kr-1)*8+sc]==='P')s-=15;if(g.board[(kr-2)*8+sc]==='P')s-=8;}}}
+        if(bk>=0){const kr=Math.floor(bk/8),kc=bk%8;
+            for(const dc of[-1,0,1]){const sc=kc+dc;if(sc>=0&&sc<8){if(g.board[(kr+1)*8+sc]==='p')s+=15;if(g.board[(kr+2)*8+sc]==='p')s+=8;}}}
+    }
+    /* Tempo: side to move slight bonus */
+    s+=(g.turn==='b'?10:-10);
     return s;
 }
 
-function order(ms,g,ttm){
+function order(ms,g,ttm,ply){
     return ms.map(m=>{
         let sc=0;
-        if(ttm&&m.f===ttm.f&&m.t===ttm.t)sc=200000;
+        if(ttm&&m.f===ttm.f&&m.t===ttm.t)sc=1000000;
         const cap=g.board[m.t];
-        if(cap)sc+=50000+10*MAT[cap.toLowerCase()]-MAT[g.board[m.f].toLowerCase()];
-        if(m.promo)sc+=40000;
+        if(cap)sc+=500000+10*MAT[cap.toLowerCase()]-MAT[g.board[m.f].toLowerCase()];
+        else{if(KM[ply*2]===(m.f<<6|m.t)||KM[ply*2+1]===(m.f<<6|m.t))sc+=100000;sc+=HT[m.f<<6|m.t];}
+        if(m.promo)sc+=400000+(m.promo==='Q'?50000:0);
         return{m,sc};
     }).sort((a,b)=>b.sc-a.sc).map(x=>x.m);
 }
 
-function quiesce(g,alpha,beta,ply){
-    const stand=evaluate(g);
-    if(stand>=beta)return beta;
-    if(stand>alpha)alpha=stand;
-    if(ply>12)return alpha;
-    const color=g.turn;
-    const ms=order(g.allMoves(color).filter(m=>g.board[m.t]||m.ep||m.promo),g,null);
+function quiesce(g,alpha,beta,depth){
+    const stand=evaluate(g);if(stand>=beta)return beta;if(stand>alpha)alpha=stand;
+    if(depth<=0)return alpha;
+    const ms=order(g.allMoves(g.turn).filter(m=>g.board[m.t]||m.ep||m.promo),g,null,0);
     for(const m of ms){
-        // Delta pruning
-        const cap=g.board[m.t];
-        if(cap&&stand+MAT[cap.toLowerCase()]+200<alpha)continue;
-        const ng=g.copy();ng.applyRaw(m);
-        const s=-quiesce(ng,-beta,-alpha,ply+1);
-        if(s>=beta)return beta;
-        if(s>alpha)alpha=s;
+        /* Delta pruning */
+        const cap=g.board[m.t];if(cap&&stand+MAT[cap.toLowerCase()]+200<alpha)continue;
+        const ng=g.copy();ng.applyRaw(m);const s=-quiesce(ng,-beta,-alpha,depth-1);
+        if(s>=beta)return beta;if(s>alpha)alpha=s;
     }
     return alpha;
 }
 
 let searchStart,timeLimit;
-
 function negamax(g,depth,alpha,beta,allowNull,ply){
     if(Date.now()-searchStart>timeLimit)throw 0;
-    const h=hash(g);
-    const tte=ttGet(h);
-    let ttm=null;
-    if(tte){
-        ttm=tte.m;
-        if(tte.d>=depth){
-            const ts=tte.s;
-            if(tte.f===EXACT)return ts;
-            if(tte.f===LOWER&&ts>alpha)alpha=ts;
-            if(tte.f===UPPER&&ts<beta)beta=ts;
-            if(alpha>=beta)return ts;
-        }
+    if(g.half>=100)return 0;
+    const h=hash(g),tte=ttGet(h);
+    let ttm=tte?tte.m:null;
+    if(tte&&tte.d>=depth){if(tte.f===0)return tte.s;if(tte.f===1&&tte.s>alpha)alpha=tte.s;if(tte.f===2&&tte.s<beta)beta=tte.s;if(alpha>=beta)return tte.s;}
+    const color=g.turn,inChk=g.inCheck(color);
+    if(inChk)depth++;
+    if(depth<=0)return quiesce(g,alpha,beta,8);
+    /* Null move pruning (enhanced: R=3 at depth>=5) */
+    if(allowNull&&!inChk&&depth>=3&&evaluate(g)>=beta){
+        const R=depth>=5?3:2;
+        const ng=g.copy();ng.turn=ng.turn==='w'?'b':'w';ng.ep=null;
+        const s=-negamax(ng,depth-1-R,-beta,-beta+1,false,ply+1);
+        if(s>=beta)return beta;
     }
-    const color=g.turn;
-    const inChk=g.inCheck(color);
-    if(inChk)depth++; // check extension
-    if(depth<=0)return quiesce(g,alpha,beta,0);
-
-    // Null move pruning
-    if(allowNull&&!inChk&&depth>=3){
-        const staticEval=evaluate(g);
-        if(staticEval>=beta){
-            const ng=g.copy();ng.turn=ng.turn==='w'?'b':'w';ng.ep=null;
-            const R=depth>6?3:2;
-            const s=-negamax(ng,depth-1-R,-beta,-beta+1,false,ply+1);
-            if(s>=beta){ttSet(h,depth,beta,LOWER,null);return beta;}
-        }
-    }
-
-    let ms=g.allMoves(color);
-    if(ms.length===0)return inChk?(-24000+ply):0;
-    ms=order(ms,g,ttm);
-
-    let bestScore=-Infinity,bestMove=null,flag=UPPER;
+    /* Futility pruning */
+    const fMargin=[0,100,300,500];
+    if(!inChk&&depth<=3&&ply>0){const e=evaluate(g);if(color==='b'&&e-fMargin[depth]>=beta)return beta;if(color==='w'&&e+fMargin[depth]<=alpha)return alpha;}
+    let ms=order(g.allMoves(color),g,ttm,ply);
+    if(ms.length===0)return inChk?(-25000+ply):0;
+    let bestS=-Infinity,bestM=null,f=UPPER;
     for(let i=0;i<ms.length;i++){
-        const m=ms[i];
-        const ng=g.copy();ng.applyRaw(m);
+        const m=ms[i],ng=g.copy();ng.applyRaw(m);
         let s;
-        const isQuiet=!g.board[m.t]&&!m.ep&&!m.promo&&!m.cas;
-        if(i===0){
-            s=-negamax(ng,depth-1,-beta,-alpha,true,ply+1);
-        } else {
-            // Late Move Reduction
-            let reduction=0;
-            if(i>=4&&depth>=3&&isQuiet&&!ng.inCheck(ng.turn==='w'?'b':'w'))reduction=Math.floor(Math.log(i)*Math.log(depth)*0.5);
-            // PVS with LMR
-            s=-negamax(ng,depth-1-reduction,-alpha-1,-alpha,true,ply+1);
-            if(s>alpha&&(reduction>0||s<beta))s=-negamax(ng,depth-1,-beta,-alpha,true,ply+1);
+        if(i===0)s=-negamax(ng,depth-1,-beta,-alpha,true,ply+1);
+        else{
+            /* Late Move Reduction: skip for captures/checks/promos */
+            const givesCheck=ng.inCheck(ng.turn);
+            const R=(i>4&&depth>3&&!g.board[m.t]&&!m.ep&&!m.cas&&!m.promo&&!givesCheck)?(i>10?2:1):0;
+            s=-negamax(ng,depth-1-R,-alpha-1,-alpha,true,ply+1);
+            if(s>alpha)s=-negamax(ng,depth-1,-beta,-alpha,true,ply+1);
         }
-        if(s>bestScore){bestScore=s;bestMove=m;}
-        if(s>alpha){alpha=s;flag=EXACT;}
-        if(alpha>=beta){flag=LOWER;break;}
+        if(s>bestS){bestS=s;bestM=m;}
+        if(s>alpha){alpha=s;f=EXACT;HT[m.f<<6|m.t]+=depth*depth;}
+        if(alpha>=beta){f=LOWER;if(!g.board[m.t]){KM[ply*2+1]=KM[ply*2];KM[ply*2]=m.f<<6|m.t;}break;}
     }
-    ttSet(h,depth,bestScore,flag,bestMove);
-    return bestScore;
+    ttSet(h,depth,bestS,f,bestM);
+    return bestS;
 }
 
 self.onmessage=function(e){
     const{board,turn,castle,ep,half,full,timeLimitMs}=e.data;
     const g=new Game();
     g.board=[...board];g.turn=turn;g.castle={w:{...castle.w},b:{...castle.b}};g.ep=ep;g.half=half;g.full=full;
-
-    searchStart=Date.now();timeLimit=timeLimitMs||3000;
-    let best=null,reachedDepth=0;
-
-    for(let depth=1;depth<=64;depth++){
+    searchStart=Date.now();timeLimit=timeLimitMs||4000;
+    let best=null,reached=0;HT.fill(0);KM.fill(0);
+    for(let d=1;d<=64;d++){
         try{
-            let ms=order(g.allMoves(g.turn),g,best);
-            if(!ms.length)break;
-            let alpha=-Infinity,beta=Infinity,bm=null;
-            // Aspiration windows after depth 4
-            if(depth>4&&best){
-                const prev=evaluate(g);
-                alpha=prev-50;beta=prev+50;
+            let ms=order(g.allMoves(g.turn),g,best,0),a=-Infinity,b=Infinity,bm=null;
+            /* Aspiration windows from depth 5 */
+            if(d>5&&best){const prev=evaluate(g);a=prev-50;b=prev+50;}
+            outer:for(let w=0;w<4;w++){
+                a=w===0?a:-Infinity;b=w===0?b:Infinity;let curA=a;
+                for(const m of ms){const ng=g.copy();ng.applyRaw(m);const s=-negamax(ng,d-1,-b,-curA,true,1);if(s>curA){curA=s;bm=m;}if(curA>=b)break;}
+                if(curA>a&&curA<b){a=curA;break outer;}
+                if(!w){a=curA-300;b=Infinity;}else if(w===1){a=-Infinity;b=curA+300;}
             }
-            outer:for(let wi=0;wi<3;wi++){
-                alpha=wi===0?alpha:-Infinity;beta=wi===0?beta:Infinity;
-                bm=null;let a=alpha;
-                for(const m of ms){
-                    const ng=g.copy();ng.applyRaw(m);
-                    const s=-negamax(ng,depth-1,-beta,-a,true,1);
-                    if(s>a){a=s;bm=m;}
-                    if(a>=beta)break;
-                }
-                if(a>alpha&&a<beta){alpha=a;break outer;}
-                // Widen
-                if(!wi){alpha=a-200;beta=Infinity;}
-            }
-            if(bm)best=bm;
-            reachedDepth=depth;
-            postMessage({type:'depth',depth,elapsed:Date.now()-searchStart});
-        }catch(ex){break;}
+            if(bm)best=bm;reached=d;
+            postMessage({type:'depth',depth:d,elapsed:Date.now()-searchStart});
+        }catch(x){break;}
         if(Date.now()-searchStart>timeLimit*0.85)break;
     }
-    postMessage({type:'result',move:best,depth:reachedDepth});
+    postMessage({type:'result',move:best,depth:reached});
 };
-</script>
+    </script>
 
-<script>
-/* ══════════════════════════════════
-   GAME ENGINE (main thread — UI only)
-══════════════════════════════════ */
-class Game {
-    constructor(){this.reset();}
-    reset(){
-        this.board=['r','n','b','q','k','b','n','r','p','p','p','p','p','p','p','p',null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,'P','P','P','P','P','P','P','P','R','N','B','Q','K','B','N','R'];
-        this.turn='w';this.castle={w:{k:true,q:true},b:{k:true,q:true}};this.ep=null;this.half=0;this.full=1;this.history=[];this.captured={w:[],b:[]};
-    }
-    col(i){const p=this.board[i];return p?(p===p.toUpperCase()?'w':'b'):null;}
-    idx(r,c){return(r<0||r>7||c<0||c>7)?null:r*8+c;}
-    rc(i){return[Math.floor(i/8),i%8];}
-    moves(i,noCheck=false){
-        const p=this.board[i];if(!p)return[];const c=this.col(i);if(!noCheck&&c!==this.turn)return[];
-        const ms=this.pseudo(i);if(noCheck)return ms;
-        return ms.filter(m=>{const t=this.copy();t.apply(m,true);return!t.inCheck(c);});
-    }
-    pseudo(i,atkOnly=false){
-        const p=this.board[i].toLowerCase(),c=this.col(i),[r,cl]=this.rc(i);
-        if(p==='p')return this.pawnM(i,c,r,cl,atkOnly);if(p==='n')return this.knightM(i,c,r,cl);
-        if(p==='b')return this.slide(i,c,[[1,1],[1,-1],[-1,1],[-1,-1]]);if(p==='r')return this.slide(i,c,[[1,0],[-1,0],[0,1],[0,-1]]);
-        if(p==='q')return this.slide(i,c,[[1,1],[1,-1],[-1,1],[-1,-1],[1,0],[-1,0],[0,1],[0,-1]]);if(p==='k')return this.kingM(i,c,r,cl,atkOnly);return[];
-    }
-    pawnM(i,c,r,cl,atk){
-        const ms=[],d=c==='w'?-1:1;
-        if(!atk){const f1=this.idx(r+d,cl);if(f1!==null&&!this.board[f1]){ms.push({f:i,t:f1});const f2=this.idx(r+2*d,cl);if((c==='w'?r===6:r===1)&&f2!==null&&!this.board[f2])ms.push({f:i,t:f2});}}
-        for(const dc of[-1,1]){const diag=this.idx(r+d,cl+dc);if(diag===null)continue;if(atk){ms.push({f:i,t:diag});continue;}if(this.board[diag]&&this.col(diag)!==c)ms.push({f:i,t:diag});else if(diag===this.ep)ms.push({f:i,t:diag,ep:true});}
-        return ms;
-    }
-    knightM(i,c,r,cl){const ms=[];[[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]].forEach(([dr,dc])=>{const t=this.idx(r+dr,cl+dc);if(t!==null&&this.col(t)!==c)ms.push({f:i,t});});return ms;}
-    slide(i,c,dirs){const ms=[],[r0,c0]=this.rc(i);dirs.forEach(([dr,dc])=>{let r=r0+dr,cv=c0+dc;while(r>=0&&r<8&&cv>=0&&cv<8){const t=this.idx(r,cv);if(!this.board[t])ms.push({f:i,t});else{if(this.col(t)!==c)ms.push({f:i,t});break;}r+=dr;cv+=dc;}});return ms;}
-    kingM(i,c,r,cl,atk){
-        const ms=[];[[1,1],[1,-1],[-1,1],[-1,-1],[1,0],[-1,0],[0,1],[0,-1]].forEach(([dr,dc])=>{const t=this.idx(r+dr,cl+dc);if(t!==null&&this.col(t)!==c)ms.push({f:i,t});});
-        if(!atk&&!this.inCheck(c)){const rb=c==='w'?7:0;if(this.castle[c].k&&!this.board[this.idx(rb,5)]&&!this.board[this.idx(rb,6)]&&!this.attacked(this.idx(rb,5),c)&&!this.attacked(this.idx(rb,6),c))ms.push({f:i,t:this.idx(rb,6),cas:'k'});if(this.castle[c].q&&!this.board[this.idx(rb,1)]&&!this.board[this.idx(rb,2)]&&!this.board[this.idx(rb,3)]&&!this.attacked(this.idx(rb,2),c)&&!this.attacked(this.idx(rb,3),c))ms.push({f:i,t:this.idx(rb,2),cas:'q'});}
-        return ms;
-    }
-    attacked(i,c){const e=c==='w'?'b':'w';for(let j=0;j<64;j++)if(this.col(j)===e&&this.pseudo(j,true).some(m=>m.t===i))return true;return false;}
-    inCheck(c){const k=c==='w'?'K':'k',ki=this.board.indexOf(k);return ki===-1?false:this.attacked(ki,c);}
-    apply(m,silent=false){
-        const piece=this.board[m.f],cap=this.board[m.t];
-        if(!silent&&cap)this.captured[this.turn==='w'?'w':'b'].push(cap);
-        if(m.ep){const dir=this.turn==='w'?1:-1,ci=m.t+8*dir;if(!silent)this.captured[this.turn==='w'?'w':'b'].push(this.board[ci]);this.board[ci]=null;}
-        this.board[m.t]=m.promo||piece;this.board[m.f]=null;
-        if(m.cas){const rb=this.turn==='w'?7:0;if(m.cas==='k'){this.board[this.idx(rb,5)]=this.board[this.idx(rb,7)];this.board[this.idx(rb,7)]=null;}else{this.board[this.idx(rb,3)]=this.board[this.idx(rb,0)];this.board[this.idx(rb,0)]=null;}}
-        const pl=piece.toLowerCase();
-        if(pl==='k'){this.castle[this.turn].k=false;this.castle[this.turn].q=false;}else if(pl==='r'){if(m.f%8===0)this.castle[this.turn].q=false;if(m.f%8===7)this.castle[this.turn].k=false;}
-        const oe=this.turn==='w'?'b':'w';if(m.t%8===0)this.castle[oe].q=false;if(m.t%8===7)this.castle[oe].k=false;
-        this.ep=(pl==='p'&&Math.abs(m.f-m.t)===16)?(m.f+m.t)/2:null;this.half=(pl==='p'||cap)?0:this.half+1;if(this.turn==='b')this.full++;this.turn=oe;
-        if(!silent)this.history.push({...m,piece,cap});
-    }
-    allMoves(c){let ms=[];for(let i=0;i<64;i++)if(this.col(i)===c)ms=ms.concat(this.moves(i));return ms;}
-    copy(){const g=new Game();g.board=[...this.board];g.turn=this.turn;g.castle={w:{...this.castle.w},b:{...this.castle.b}};g.ep=this.ep;g.half=this.half;g.full=this.full;return g;}
-    over(){const ms=this.allMoves(this.turn);if(ms.length===0)return this.inCheck(this.turn)?'checkmate':'stalemate';if(this.half>=100)return'draw50';return null;}
-}
-
-/* ══ UI ══ */
-class UI {
-    constructor(){
-        this.g=new Game();
-        this.SYM={K:'♔',Q:'♕',R:'♖',B:'♗',N:'♘',P:'♙',k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟'};
-        this.sel=null;this.valid=[];this.last=null;this.pend=null;this.thinking=false;
-        this.worker=null;
-        this.bind();
-        this.buildWorker();
-    }
-    buildWorker(){
-        const src=document.getElementById('worker-src').textContent;
-        const blob=new Blob([src],{type:'application/javascript'});
-        this.worker=new Worker(URL.createObjectURL(blob));
-        this.worker.onmessage=e=>{
-            const d=e.data;
-            if(d.type==='depth'){
-                const pct=Math.min(100,(d.depth/20)*100);
-                document.getElementById('depth-fill').style.width=pct+'%';
-                document.getElementById('depth-cur').textContent='depth '+d.depth;
-                document.getElementById('depth-elapsed').textContent=d.elapsed+'ms';
-            } else if(d.type==='result'){
-                this.onResult(d.move,d.depth);
+    <script>
+        /* ══════════════ GAME (main thread) ══════════════ */
+        class Game {
+            constructor() { this.reset(); }
+            reset() {
+                this.board = ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r', 'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'];
+                this.turn = 'w'; this.castle = { w: { k: true, q: true }, b: { k: true, q: true } }; this.ep = null; this.half = 0; this.full = 1; this.history = []; this.captured = { w: [], b: [] };
+                /* Full state snapshots for rewind */
+                this.snapshots = [];
             }
-        };
-    }
-    bind(){
-        document.getElementById('start-btn').onclick=()=>this.start();
-        document.getElementById('restart-btn').onclick=()=>location.reload();
-        document.querySelectorAll('.promo-opt').forEach(o=>o.onclick=()=>this.promo(o.dataset.p));
-    }
-    start(){
-        document.getElementById('start-screen').classList.add('hidden');
-        document.getElementById('game-screen').classList.add('active');
-        document.getElementById('ai-status').textContent='Idle';
-        this.render();
-    }
-    render(){
-        const board=document.getElementById('chess-board');board.innerHTML='';
-        for(let i=0;i<64;i++){
-            const sq=document.createElement('div'),r=Math.floor(i/8),c=i%8;
-            sq.className=`sq ${(r+c)%2===0?'light':'dark'}`;
-            if(this.sel===i)sq.classList.add('selected');
-            if(this.last){if(this.last.f===i)sq.classList.add('last-from');if(this.last.t===i)sq.classList.add('last-to');}
-            const iv=this.valid.some(m=>m.t===i);
-            if(iv){if(this.g.board[i])sq.classList.add('capture-hint');else sq.classList.add('valid');}
-            const p=this.g.board[i];if(p){sq.dataset.color=this.g.col(i);sq.textContent=this.SYM[p];}
-            sq.onclick=()=>this.click(i);board.appendChild(sq);
+            col(i) { const p = this.board[i]; return p ? (p === p.toUpperCase() ? 'w' : 'b') : null; }
+            idx(r, c) { return (r < 0 || r > 7 || c < 0 || c > 7) ? null : r * 8 + c; }
+            rc(i) { return [Math.floor(i / 8), i % 8]; }
+            moves(i, noCheck = false) {
+                const p = this.board[i]; if (!p) return []; const c = this.col(i); if (!noCheck && c !== this.turn) return [];
+                const ms = this.pseudo(i); if (noCheck) return ms;
+                return ms.filter(m => { const t = this.copy(); t.apply(m, true); return !t.inCheck(c); });
+            }
+            pseudo(i, atkOnly = false) {
+                const p = this.board[i].toLowerCase(), c = this.col(i), [r, cl] = this.rc(i);
+                if (p === 'p') return this.pawnM(i, c, r, cl, atkOnly); if (p === 'n') return this.knightM(i, c, r, cl);
+                if (p === 'b') return this.slide(i, c, [[1, 1], [1, -1], [-1, 1], [-1, -1]]); if (p === 'r') return this.slide(i, c, [[1, 0], [-1, 0], [0, 1], [0, -1]]);
+                if (p === 'q') return this.slide(i, c, [[1, 1], [1, -1], [-1, 1], [-1, -1], [1, 0], [-1, 0], [0, 1], [0, -1]]); if (p === 'k') return this.kingM(i, c, r, cl, atkOnly); return [];
+            }
+            pawnM(i, c, r, cl, atk) {
+                const ms = [], d = c === 'w' ? -1 : 1;
+                if (!atk) { const f1 = this.idx(r + d, cl); if (f1 !== null && !this.board[f1]) { ms.push({ f: i, t: f1 }); const f2 = this.idx(r + 2 * d, cl); if ((c === 'w' ? r === 6 : r === 1) && f2 !== null && !this.board[f2]) ms.push({ f: i, t: f2 }); } }
+                for (const dc of [-1, 1]) { const diag = this.idx(r + d, cl + dc); if (diag === null) continue; if (atk) { ms.push({ f: i, t: diag }); continue; } if (this.board[diag] && this.col(diag) !== c) ms.push({ f: i, t: diag }); else if (diag === this.ep) ms.push({ f: i, t: diag, ep: true }); }
+                return ms;
+            }
+            knightM(i, c, r, cl) { const ms = [];[[2, 1], [2, -1], [-2, 1], [-2, -1], [1, 2], [1, -2], [-1, 2], [-1, -2]].forEach(([dr, dc]) => { const t = this.idx(r + dr, cl + dc); if (t !== null && this.col(t) !== c) ms.push({ f: i, t }); }); return ms; }
+            slide(i, c, dirs) { const ms = [], [r0, c0] = this.rc(i); dirs.forEach(([dr, dc]) => { let r = r0 + dr, cv = c0 + dc; while (r >= 0 && r < 8 && cv >= 0 && cv < 8) { const t = this.idx(r, cv); if (!this.board[t]) ms.push({ f: i, t }); else { if (this.col(t) !== c) ms.push({ f: i, t }); break; } r += dr; cv += dc; } }); return ms; }
+            kingM(i, c, r, cl, atk) {
+                const ms = [];[[1, 1], [1, -1], [-1, 1], [-1, -1], [1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dr, dc]) => { const t = this.idx(r + dr, cl + dc); if (t !== null && this.col(t) !== c) ms.push({ f: i, t }); });
+                if (!atk && !this.inCheck(c)) { const rb = c === 'w' ? 7 : 0; if (this.castle[c].k && !this.board[this.idx(rb, 5)] && !this.board[this.idx(rb, 6)] && !this.attacked(this.idx(rb, 5), c) && !this.attacked(this.idx(rb, 6), c)) ms.push({ f: i, t: this.idx(rb, 6), cas: 'k' }); if (this.castle[c].q && !this.board[this.idx(rb, 1)] && !this.board[this.idx(rb, 2)] && !this.board[this.idx(rb, 3)] && !this.attacked(this.idx(rb, 2), c) && !this.attacked(this.idx(rb, 3), c)) ms.push({ f: i, t: this.idx(rb, 2), cas: 'q' }); }
+                return ms;
+            }
+            attacked(i, c) { const e = c === 'w' ? 'b' : 'w'; for (let j = 0; j < 64; j++) if (this.col(j) === e && this.pseudo(j, true).some(m => m.t === i)) return true; return false; }
+            inCheck(c) { const k = c === 'w' ? 'K' : 'k', ki = this.board.indexOf(k); return ki === -1 ? false : this.attacked(ki, c); }
+            /* Save full snapshot before applying move */
+            saveSnapshot() {
+                this.snapshots.push({
+                    board: [...this.board],
+                    turn: this.turn,
+                    castle: { w: { ...this.castle.w }, b: { ...this.castle.b } },
+                    ep: this.ep,
+                    half: this.half,
+                    full: this.full,
+                    history: this.history.map(h => ({ ...h })),
+                    captured: { w: [...this.captured.w], b: [...this.captured.b] }
+                });
+            }
+            /* Restore to a previous snapshot */
+            restoreSnapshot(snap) {
+                this.board = [...snap.board];
+                this.turn = snap.turn;
+                this.castle = { w: { ...snap.castle.w }, b: { ...snap.castle.b } };
+                this.ep = snap.ep;
+                this.half = snap.half;
+                this.full = snap.full;
+                this.history = snap.history.map(h => ({ ...h }));
+                this.captured = { w: [...snap.captured.w], b: [...snap.captured.b] };
+            }
+            apply(m, silent = false) {
+                const piece = this.board[m.f], cap = this.board[m.t];
+                if (!silent && cap) this.captured[this.turn === 'w' ? 'w' : 'b'].push(cap);
+                if (m.ep) { const dir = this.turn === 'w' ? 1 : -1, ci = m.t + 8 * dir; if (!silent) this.captured[this.turn === 'w' ? 'w' : 'b'].push(this.board[ci]); this.board[ci] = null; }
+                this.board[m.t] = m.promo || piece; this.board[m.f] = null;
+                if (m.cas) { const rb = this.turn === 'w' ? 7 : 0; if (m.cas === 'k') { this.board[this.idx(rb, 5)] = this.board[this.idx(rb, 7)]; this.board[this.idx(rb, 7)] = null; } else { this.board[this.idx(rb, 3)] = this.board[this.idx(rb, 0)]; this.board[this.idx(rb, 0)] = null; } }
+                const pl = piece.toLowerCase();
+                if (pl === 'k') { this.castle[this.turn].k = false; this.castle[this.turn].q = false; } else if (pl === 'r') { if (m.f % 8 === 0) this.castle[this.turn].q = false; if (m.f % 8 === 7) this.castle[this.turn].k = false; }
+                const oe = this.turn === 'w' ? 'b' : 'w'; if (m.t % 8 === 0) this.castle[oe].q = false; if (m.t % 8 === 7) this.castle[oe].k = false;
+                this.ep = (pl === 'p' && Math.abs(m.f - m.t) === 16) ? (m.f + m.t) / 2 : null; this.half = (pl === 'p' || cap) ? 0 : this.half + 1; if (this.turn === 'b') this.full++; this.turn = oe;
+                if (!silent) this.history.push({ ...m, piece, cap });
+            }
+            allMoves(c) { let ms = []; for (let i = 0; i < 64; i++) if (this.col(i) === c) ms = ms.concat(this.moves(i)); return ms; }
+            copy() { const g = new Game(); g.board = [...this.board]; g.turn = this.turn; g.castle = { w: { ...this.castle.w }, b: { ...this.castle.b } }; g.ep = this.ep; g.half = this.half; g.full = this.full; return g; }
+            over() { const ms = this.allMoves(this.turn); if (ms.length === 0) return this.inCheck(this.turn) ? 'checkmate' : 'stalemate'; if (this.half >= 100) return 'draw50'; return null; }
+            materialScore() {
+                const M = { p: 100, n: 325, b: 350, r: 525, q: 1000, k: 0 };
+                let s = 0; for (let i = 0; i < 64; i++) { const p = this.board[i]; if (!p) continue; const isW = p === p.toUpperCase(); s += (isW ? 1 : -1) * M[p.toLowerCase()]; }
+                return s;
+            }
         }
-        this.updateSide();
-    }
-    click(i){
-        if(this.g.turn!=='w'||this.thinking)return;
-        const mv=this.valid.find(m=>m.t===i);
-        if(mv){
-            if(this.g.board[mv.f]==='P'&&Math.floor(i/8)===0){this.pend=mv;document.getElementById('promo-modal').classList.remove('hidden');return;}
-            this.exec(mv);
-        } else {
-            if(this.g.col(i)==='w'){this.sel=i;this.valid=this.g.moves(i);}
-            else{this.sel=null;this.valid=[];}
+
+        /* ══════════════ PLAYBACK SKILL ══════════════ */
+        class PlaybackSkill {
+            constructor() {
+                this.TURNS_BEFORE_FIRST_USE = 3;
+                this.COOLDOWN_TURNS = 5;
+                this.turnsPlayed = 0;
+                this.lastUsedAt = -999;
+                this.disabled = false; // game-over lock
+                this.btn = document.getElementById('playback-btn');
+                this.label = document.getElementById('playback-label');
+                this.arc = document.getElementById('playback-arc');
+            }
+
+            onMovePlayed() {
+                this.turnsPlayed++;
+                this.updateState();
+            }
+
+            onRewindUsed() {
+                this.lastUsedAt = this.turnsPlayed;
+                this.turnsPlayed = Math.max(0, this.turnsPlayed - 2);
+                this.updateState();
+            }
+
+            disable() {
+                this.disabled = true;
+                this.btn.disabled = true;
+                this.btn.classList.remove('ready');
+                this.label.textContent = 'Game over';
+                this._updatePips(0);
+                this._setArc(0);
+            }
+
+            get cooldownRemaining() {
+                return Math.max(0, this.COOLDOWN_TURNS - (this.turnsPlayed - this.lastUsedAt));
+            }
+
+            get isUnlocked() {
+                return this.turnsPlayed >= this.TURNS_BEFORE_FIRST_USE;
+            }
+
+            get isReady() {
+                return !this.disabled && this.isUnlocked && this.cooldownRemaining === 0;
+            }
+
+            updateState() {
+                if (this.disabled) return;
+
+                if (!this.isUnlocked) {
+                    this.btn.disabled = true;
+                    this.btn.classList.remove('ready');
+                    const needed = this.TURNS_BEFORE_FIRST_USE - this.turnsPlayed;
+                    this.label.textContent = `Unlocks in ${needed}t`;
+                    this._updatePips(0);
+                    this._setArc(0);
+                    return;
+                }
+
+                if (this.isReady) {
+                    this.btn.disabled = false;
+                    this.btn.classList.add('ready');
+                    this.label.textContent = 'Rewind 1 turn';
+                    this._updatePips(this.COOLDOWN_TURNS);
+                    this._setArc(0);
+                } else {
+                    this.btn.disabled = true;
+                    this.btn.classList.remove('ready');
+                    const rem = this.cooldownRemaining;
+                    this.label.textContent = `Cooldown: ${rem} turns`;
+                    this._updatePips(this.COOLDOWN_TURNS - rem);
+                    /* Arc shows progress recovered: 1=just used(full ring), 0=ready(empty) */
+                    this._setArc(rem / this.COOLDOWN_TURNS);
+                }
+            }
+
+            _updatePips(filled) {
+                for (let i = 0; i < 5; i++) {
+                    document.getElementById(`pip${i}`).classList.toggle('filled', i < filled);
+                }
+            }
+
+            _setArc(fraction) {
+                /* fraction 0=no arc (ready), 1=full arc (just used/locked) */
+                /* SVG circle circumference with r=15.9 and viewBox units: C = 2*pi*15.9 ~ 99.9 */
+                const C = 2 * Math.PI * 15.9;
+                /* We show the REMAINING cooldown as a filled arc, counting down from full */
+                const offset = C * (1 - fraction);
+                this.arc.style.strokeDasharray = C;
+                this.arc.style.strokeDashoffset = offset;
+            }
+
+            triggerActivateAnimation() {
+                this.btn.classList.remove('activating');
+                void this.btn.offsetWidth;
+                this.btn.classList.add('activating');
+                setTimeout(() => this.btn.classList.remove('activating'), 500);
+            }
         }
-        this.render();
-    }
-    promo(type){this.pend.promo=type.toUpperCase();document.getElementById('promo-modal').classList.add('hidden');this.exec(this.pend);this.pend=null;}
-    exec(m){
-        this.g.apply(m);this.last=m;this.sel=null;this.valid=[];this.render();
-        const res=this.g.over();if(res)this.endGame(res);else setTimeout(()=>this.aiMove(),100);
-    }
-    aiMove(){
-        this.thinking=true;
-        document.getElementById('ai-card').classList.add('active-card');
-        document.getElementById('me-card').classList.remove('active-card');
-        document.getElementById('ai-status').innerHTML='<span class="think-spinner"></span>Searching...';
-        document.getElementById('ai-status').classList.add('live');
-        document.getElementById('me-status').textContent='Waiting';
-        document.getElementById('me-status').classList.remove('live');
-        document.getElementById('depth-fill').style.width='0%';
-        document.getElementById('depth-cur').textContent='—';
-        document.getElementById('depth-elapsed').textContent='—';
-        this.worker.postMessage({board:[...this.g.board],turn:this.g.turn,castle:{w:{...this.g.castle.w},b:{...this.g.castle.b}},ep:this.g.ep,half:this.g.half,full:this.g.full,timeLimitMs:3000});
-    }
-    onResult(move,depth){
-        this.thinking=false;
-        if(move){
-            move.piece=this.g.board[move.f];
-            this.g.apply(move);this.last=move;this.render();
-            const res=this.g.over();if(res){this.endGame(res);return;}
+
+        /* ══════════════ RAID FX ENGINE ══════════════ */
+        class RaidFX {
+            constructor() {
+                this.layer = document.getElementById('raid-layer');
+                this.combo = 0;
+                this.comboTimer = null;
+                this.commentTimers = [];
+                this.GENERIC = ["GLHF", "Watching u", "Nice board", "Is that it?", "Hmm", "Calculated", "OmegaLUL", "GG?", "Hurry up", "Sub to me!", "1.2M watching", "Big brain time", "PepeHands", "Kreygasm", "EZ Clap", "MonkaS", "RIP", "PogU", "PogChamp", "KEKW", "YEP", "WTF", "who is this guy", "speedrun?", "AI > Human", "classic beginner", "visible confusion", "is this a bot?", "throwing?", "400IQ", "nooo", "OMEGALUL", "4Head", "wait what", "not like this", "ResidentSleeper", "BibleThump", "Kappa", "forsenCD", "DansGame", "PauseChamp", "catJAM", "GIGACHAD MOVE?", "I'm scared", "oh no", "gg early", "LUL", "chat is this real?", "mods ban him", "how is this legal", "chess god?", "???", "!!", "Clueless", "Aware", "ICANT", "Donation: $5 - Skill issue", "Hydrate!", "Ads incoming...", "I missed the play", "Classic chat", "Any gifters?", "Poggers", "5Head", "Imagine losing", "Skill match", "Pure RNG", "Top 10 moments", "Video idea?", "Clickbait", "Sus", "Amogus?", "No cap", "For real for real", "Sheesh", "Bet", "Mid play", "Ratio", "Cope", "Seethe", "Mald", "git gud", "Who invited this guy?", "Main character energy", "Anime plot armor?", "I was here", "PogChamp in chat!", "VIP when?", "Stream sniper?", "Lag?", "F in the chat", "WidePeepoHappy", "Sadge", "Pepega", "WutFace", "Jebaited", "Galaxy brain", "Thinking emoji", "Fire", "Lit", "Drip", "Fr", "Slay", "King energy", "Wait for it", "Wait for the drop", "Calculated risk", "Choke?", "Is it Joever?", "We are so back", "Trust the process", "Scripted", "Rigged", "Hacks", "Reported", "Aimbot for chess?", "Stockfish?", "I see it", "He doesn't see it", "Tunnel vision", "Check the engine", "Eval bar update", "Blunder incoming", "Move of the century", "Cooking", "Let him cook", "He's cooking", "Chef's kiss", "Garbage", "Delete the game", "Uninstall", "Rage quit?", "Oof", "Big oof", "Yikes", "Soul read", "Mind games", "Psychological warfare", "ASMR Chess", "Satisfying", "Smooth", "Like butter", "Clean", "TACTICAL", "Strategic", "Philosophical move", "Clip it!", "Clip that!", "Absolute CINEMA"];
+                this.BLUNDER = ["FATAL BLUNDER!!", "NOOO", "BAD MOVE LUL", "RIP", "you just lost", "GG EZ", "L + blunder", "bro...", "that's rough", "OhMyDog", "D:", "OMEGALUL", "why would you do that", "BibleThump", "chat he's cooked", "What was that?", "Terrible!", "Absolute garbage", "Throwing!!", "Are you blind?", "Classic blunder", "My eyes!!", "Delete this", "I can't watch", "Pain", "Bruh moment", "L move", "Big L", "Massive L", "Ratioed by engine", "Eval bar died", "Negative aura", "Bot behavior", "Lower than 100 ELO", "My cat moves better", "Zero IQ", "Smooth brain", "Brain lag", "Disconnected", "Report AI for bullying", "Stop the count!", "Tilted", "Hard tilted", "So bad", "F-tier move", "Plastic rank", "Wood player", "Shameful", "Dishonor", "Unlucky", "Copium", "Need more copium", "Seethe", "Mald", "Cry about it", "Skill issue detected", "Git gud kid", "Go back to checkers", "Undos when?", "Mouse slip?", "Misclick?", "Worst move ever", "Historical blunder", "Museum of failures", "Hall of Shame", "Top 10 fails", "Funny moments", "COOKED"];
+                this.GOODMOVE = ["GOD MOVE!!", "INSANE!!", "W player", "PogChamp", "YOOO", "CRISPY", "big brain", "that was clean", "Pog", "BASED", "monkaW", "HOW", "genius??", "SHEEEESH", "chat did u see that?", "LETSGO", "cracked", "no way", "HACKUSATION", "EZ", "that's the play", "SICKO MODE", "Brilliant!", "Absolute cinema", "Masterclass", "Magnus?", "AlphaZero?", "Grandmaster energy", "Peak chess", "Holy hell!", "Google en passant", "Goat", "W move", "Major W", "Huge W", "Chef's kiss", "Pure gold", "Diamond play", "Star player", "Carry", "Main character", "Scripted victory", "Aura +1000", "Maximum rizz", "Chess god mode", "Unstoppable", "In the zone", "Mind blowing", "Brain expanded", "1000 IQ", "Forbidden move", "Secret technique", "Hidden talent", "Found it!", "The only move", "Best choice", "Perfect", "Flawless", "Elegant", "Elite", "High ELO move", "Pro level", "Clip it now!", "Viral moment", "Ultra instinct", "Super Saiyan", "Kaioken", "Simply better", "Different breed", "Built different", "Skill diff"];
+                this.CHECK = ["CHECK!!", "👑 in danger", "RUN KING RUN", "check check check", "EZ CHECK", "king on the run", "monkaS", "PauseChamp", "KINGSAFETY", "CHAT he's in check", "Danger Zone", "Target locked", "Nowhere to hide", "King is sweating", "Nervous king", "Call an ambulance!", "Assassination attempt", "Sniper!", "King's castle is falling", "Defenses breached", "Intruder!", "Red alert!", "Panic!", "Sike!", "Gotcha", "Checkmate soon?", "Almost dead", "One life left", "Final boss phase 2", "Pressure!", "Under pressure", "Ticking time bomb", "Boom!", "Checkmate loading...", "King in the mud", "Nasty check"];
+                this.CAPTURE = ["CAPTURED!", "om nom nom", "got em", "trade accepted", "material acquired", "piece taken", "sacrifice??", "bro lost a piece", "rip piece", "Hungry for pieces", "Piece delicious", "Yum", "Munch", "Crunch", "Delete piece", "Piece.exe not found", "Gone", "Reduced to atoms", "Vanished", "Stolen", "Robbed", "Looted", "Material advantage", "Winning the trade", "Stonks", "Economy boost", "Gold lead", "Numerical superiority", "Clean take", "Snipped", "Removed", "Evicted", "Owned", "Pwned", "Rekt", "Destroyed", "Demolished", "Annihilated", "Obliterated", "Exterminated", "Fallen soldier", "Press F"];
+                this.REWIND = ["REWIND?!", "TIME MANIPULATION", "Wait what??", "ILLEGAL??", "Chat he used time!", "BackInTime", "Undo master", "Cheat code?", "Ctrl+Z activated", "That move didn't happen", "404: move not found", "Temporal hack!", "Reverse card!", "PauseChamp time reversal", "CHEATER!!! (jk)", "Time Loop activated", "Back to the future!", "Clock manipulation??", "He rewound!", "Time warp LUL"];
+                this.lastPieceTargetIdx = null;
+            }
+            spawnComment(text, type = 'fc-normal') {
+                const el = document.createElement('div');
+                el.className = `floating-comment ${type}`;
+                el.textContent = text;
+                const top = 40 + Math.random() * (window.innerHeight - 120);
+                el.style.cssText = `top:${top}px;left:110vw;`;
+                this.layer.appendChild(el);
+                const duration = 5000 + Math.random() * 4000;
+                const dist = window.innerWidth + 600;
+                el.animate([{ transform: 'translateX(0)', opacity: 0.9 }, { transform: `translateX(-${dist}px)`, opacity: 0.7 }], { duration, easing: 'linear' }).onfinish = () => el.remove();
+                setTimeout(() => { if (el.parentNode) el.remove(); }, duration + 100);
+            }
+            burstParticles(x, y, color = '#ff00ff', count = 12) {
+                for (let i = 0; i < count; i++) {
+                    const p = document.createElement('div');
+                    const angle = Math.random() * Math.PI * 2;
+                    const dist = 40 + Math.random() * 80;
+                    p.className = 'particle';
+                    p.style.cssText = `width:${4 + Math.random() * 6}px;height:${4 + Math.random() * 6}px;background:${color};left:${x}px;top:${y}px;--dx:${Math.cos(angle) * dist}px;--dy:${Math.sin(angle) * dist}px;`;
+                    document.body.appendChild(p);
+                    setTimeout(() => { if (p.parentNode) p.remove(); }, 900);
+                }
+            }
+            flashBoard(color) {
+                const fl = document.getElementById('board-flash');
+                fl.style.background = color; fl.style.opacity = '1';
+                setTimeout(() => { fl.style.opacity = '0'; }, 180);
+                setTimeout(() => { fl.style.background = 'transparent'; }, 400);
+            }
+            shakeBoard() {
+                const b = document.getElementById('chess-board');
+                b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake');
+                setTimeout(() => b.classList.remove('shake'), 500);
+            }
+            incrementCombo(m) {
+                if (this.lastPieceTargetIdx === m.f) this.combo++; else this.combo = 1;
+                this.lastPieceTargetIdx = m.t;
+                clearTimeout(this.comboTimer);
+                this.comboTimer = setTimeout(() => this.resetCombo(), 10000);
+                this.updateComboDisplay();
+                if (this.combo >= 2) this.spawnComment(`${this.combo}x PIECE COMBO!!`, 'fc-mega');
+            }
+            resetCombo() { this.combo = 0; this.lastPieceTargetIdx = null; this.updateComboDisplay(); }
+            updateComboDisplay() {
+                const el = document.getElementById('combo-display');
+                if (this.combo >= 2) { el.style.cssText = 'opacity:1;color:#ffff00;text-shadow:0 0 20px rgba(255,255,0,0.8);'; el.textContent = `${this.combo}× COMBO`; }
+                else el.style.opacity = '0';
+            }
+            showBanner(text, duration = 2500) {
+                const banner = document.getElementById('raid-banner'), inner = document.getElementById('raid-banner-inner');
+                inner.textContent = text; banner.style.opacity = '1';
+                setTimeout(() => { banner.style.opacity = '0'; }, duration);
+            }
+            getSquareCenter(idx) {
+                const board = document.getElementById('chess-board'), rect = board.getBoundingClientRect();
+                const r = Math.floor(idx / 8), c = idx % 8, sw = rect.width / 8, sh = rect.height / 8;
+                return { x: rect.left + c * sw + sw / 2, y: rect.top + r * sh + sh / 2 };
+            }
+            onPlayerMove(m, scoreDiff, isCheck, isCapture, g) {
+                const pos = this.getSquareCenter(m.t);
+                if (isCapture) { this.incrementCombo(m); this.spawnComment(this.pick(this.CAPTURE), 'fc-rare'); this.burstParticles(pos.x, pos.y, '#00ffff', 10); } else this.resetCombo();
+                if (isCheck) { this.spawnComment(this.pick(this.CHECK), 'fc-danger'); this.burstParticles(pos.x, pos.y, '#ff0000', 16); this.flashBoard('rgba(255,0,0,0.25)'); this.shakeBoard(); this.showBanner('CHECK!'); }
+                if (scoreDiff <= -300) { this.spawnComment(this.pick(this.BLUNDER), 'fc-danger'); this.burstParticles(pos.x, pos.y, '#ff0000', 20); this.flashBoard('rgba(255,0,0,0.3)'); this.shakeBoard(); }
+                else if (scoreDiff <= -80) { this.spawnComment(this.pick(this.BLUNDER), 'fc-danger'); this.flashBoard('rgba(255,50,0,0.15)'); }
+                else if (scoreDiff >= 300) { this.spawnComment(this.pick(this.GOODMOVE), 'fc-god'); this.burstParticles(pos.x, pos.y, '#ffff00', 24); this.flashBoard('rgba(0,255,150,0.2)'); this.showBanner('BRILLIANT!'); }
+                else if (scoreDiff >= 80) { this.spawnComment(this.pick(this.GOODMOVE), 'fc-rare'); this.burstParticles(pos.x, pos.y, '#00ff88', 10); }
+            }
+            onAIMove(m, g) {
+                const pos = this.getSquareCenter(m.t);
+                this.burstParticles(pos.x, pos.y, '#ff00ff', 8);
+                if (g.inCheck('w')) { this.spawnComment('AI says check! HA!', 'fc-danger'); this.flashBoard('rgba(255,0,255,0.2)'); this.shakeBoard(); }
+            }
+            onRewind(boardCenter) {
+                for (let i = 0; i < 6; i++) this.spawnComment(this.pick(this.REWIND), i % 2 === 0 ? 'fc-rare' : 'fc-danger');
+                this.burstParticles(boardCenter.x, boardCenter.y, '#00ffff', 30);
+                this.flashBoard('rgba(0,255,255,0.35)');
+                this.shakeBoard();
+                this.showBanner('TIME REVERSED', 2000);
+            }
+            startIdleLoop() {
+                const loop = () => {
+                    const delay = 2000 + Math.random() * 4000;
+                    this.commentTimers.push(setTimeout(() => { this.spawnComment(this.pick(this.GENERIC), 'fc-normal'); loop(); }, delay));
+                };
+                loop();
+            }
+            stopIdleLoop() { this.commentTimers.forEach(t => clearTimeout(t)); this.commentTimers = []; }
+            pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
         }
-        document.getElementById('ai-card').classList.remove('active-card');
-        document.getElementById('me-card').classList.add('active-card');
-        document.getElementById('ai-status').textContent='Idle (d'+depth+')';
-        document.getElementById('ai-status').classList.remove('live');
-        document.getElementById('me-status').textContent='Your Turn';
-        document.getElementById('me-status').classList.add('live');
-        document.getElementById('depth-cur').textContent='depth '+depth;
-    }
-    updateSide(){
-        document.getElementById('white-cap').innerHTML='<div class="cap-label">Captured by you</div>'+this.g.captured.w.map(p=>`<span>${this.SYM[p]}</span>`).join('');
-        document.getElementById('black-cap').innerHTML='<div class="cap-label">Captured by AI</div>'+this.g.captured.b.map(p=>`<span>${this.SYM[p]}</span>`).join('');
-        const list=document.getElementById('moves-list');list.innerHTML='';
-        for(let i=0;i<this.g.history.length;i+=2){
-            const row=document.createElement('div');row.className='move-row';
-            row.innerHTML=`<span>${Math.floor(i/2)+1}.</span><span>${this.note(this.g.history[i])}</span><span>${this.g.history[i+1]?this.note(this.g.history[i+1]):''}</span>`;
-            list.appendChild(row);
+
+        /* ══════════════ UI ══════════════ */
+        class UI {
+            constructor() {
+                this.g = new Game();
+                this.SYM = { K: '♔', Q: '♕', R: '♖', B: '♗', N: '♘', P: '♙', k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟' };
+                this.sel = null; this.valid = []; this.last = null; this.pend = null; this.thinking = false; this.isRaid = false;
+                this.fx = new RaidFX();
+                this.playback = null;
+                this.bgm = null;
+                this.worker = null;
+                this.bind();
+                this.buildWorker();
+            }
+            buildWorker() {
+                const src = document.getElementById('worker-src').textContent;
+                const blob = new Blob([src], { type: 'application/javascript' });
+                this.worker = new Worker(URL.createObjectURL(blob));
+                this.worker.onmessage = e => {
+                    const d = e.data;
+                    if (d.type === 'depth') {
+                        const pct = Math.min(100, (d.depth / 20) * 100);
+                        document.getElementById('depth-fill').style.width = pct + '%';
+                        document.getElementById('depth-cur').textContent = 'depth ' + d.depth;
+                        document.getElementById('depth-elapsed').textContent = d.elapsed + 'ms';
+                    } else if (d.type === 'result') { this.onResult(d.move, d.depth); }
+                };
+            }
+            bind() {
+                const click = () => this.playSfx('Click.ogg');
+                document.getElementById('start-btn').onclick = () => { click(); this.start(false); };
+                document.getElementById('raid-btn').onclick = () => { click(); this.start(true); };
+                document.getElementById('restart-btn').onclick = () => { click(); location.reload(); };
+                document.querySelectorAll('.promo-opt').forEach(o => o.onclick = () => { click(); this.promo(o.dataset.p); });
+            }
+            start(raid) {
+                this.isRaid = raid;
+                document.getElementById('start-screen').classList.add('hidden');
+                document.getElementById('game-screen').classList.add('active');
+                document.getElementById('ai-status').textContent = 'Idle';
+                if (raid) {
+                    document.body.classList.add('raid-mode');
+                    document.getElementById('ai-avatar').textContent = '!!';
+                    document.getElementById('ai-name').textContent = 'Raid Overlord';
+                    document.getElementById('skill-row').style.display = 'flex';
+                    /* Init playback skill */
+                    this.playback = new PlaybackSkill();
+                    this.playback.updateState();
+                    document.getElementById('playback-btn').onclick = () => this.doPlayback();
+
+                    this.bgm = new Audio('BGM_Raid.mp3');
+                    this.bgm.loop = true;
+                    this.bgm.play().catch(() => { });
+                    this.fx.startIdleLoop();
+                    this.fx.showBanner('RAID MODE ACTIVATED', 3000);
+                    setTimeout(() => { for (let i = 0; i < 8; i++) setTimeout(() => this.fx.spawnComment(['RAID START!', 'Lurking', 'OMEGALUL', 'Pog', 'GLHF', 'LUL', 'KEKW', 'monkaS'][i], 'fc-' + (i % 2 === 0 ? 'rare' : 'normal')), i * 300); }, 500);
+                }
+                this.render();
+            }
+
+            doPlayback() {
+                if (!this.playback || !this.playback.isReady) return;
+                if (this.g.snapshots.length < 2) return; /* need at least 2 snapshots (player + AI turn) */
+                if (this.thinking) return;
+
+                this.playSfx('Move.ogg');
+                setTimeout(() => this.playSfx('Click.ogg'), 150);
+
+                /* VFX */
+                const board = document.getElementById('chess-board'), rect = board.getBoundingClientRect();
+                const center = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+                this.fx.onRewind(center);
+                this.playback.triggerActivateAnimation();
+
+                /* Restore to 2 snapshots ago: removes last player move + last AI move */
+                const targetIdx = this.g.snapshots.length - 2;
+                const snap = this.g.snapshots[targetIdx];
+                this.g.restoreSnapshot(snap);
+                /* Trim snapshots to target */
+                this.g.snapshots = this.g.snapshots.slice(0, targetIdx);
+
+                this.last = this.g.history.length > 0 ? this.g.history[this.g.history.length - 1] : null;
+                this.sel = null; this.valid = [];
+
+                /* Update playback cooldown */
+                this.playback.onRewindUsed();
+
+                this.render();
+            }
+
+            render() {
+                const board = document.getElementById('chess-board'); board.innerHTML = '';
+                let dangerWhite = new Set(), threatBlack = -1, bestWhiteSource = -1;
+                if (this.isRaid && this.g.turn === 'w') {
+                    const MAT_VALUES = { p: 100, n: 325, b: 350, r: 525, q: 1000, k: 20000 };
+                    let maxThreatVal = -1;
+                    for (let i = 0; i < 64; i++) {
+                        if (this.g.col(i) === 'b') {
+                            const moves = this.g.pseudo(i, true);
+                            for (const m of moves) {
+                                if (this.g.col(m.t) === 'w') {
+                                    dangerWhite.add(m.t);
+                                    const val = MAT_VALUES[this.g.board[m.t].toLowerCase()];
+                                    if (val > maxThreatVal) { maxThreatVal = val; threatBlack = i; }
+                                }
+                            }
+                        }
+                    }
+                    let bestGain = 0;
+                    this.g.allMoves('w').forEach(m => {
+                        const tg = this.g.copy(), before = tg.materialScore(); tg.apply(m, true);
+                        const gain = tg.materialScore() - before;
+                        if (gain > bestGain) { bestGain = gain; bestWhiteSource = m.f; }
+                    });
+                }
+                for (let i = 0; i < 64; i++) {
+                    const sq = document.createElement('div'), r = Math.floor(i / 8), c = i % 8;
+                    sq.className = `sq ${(r + c) % 2 === 0 ? 'light' : 'dark'}`;
+                    if (this.sel === i) sq.classList.add('selected');
+                    if (this.last) { if (this.last.f === i) sq.classList.add('last-from'); if (this.last.t === i) sq.classList.add('last-to'); }
+                    const iv = this.valid.some(m => m.t === i);
+                    if (iv) { if (this.g.board[i]) sq.classList.add('capture-hint'); else sq.classList.add('valid'); }
+                    if (dangerWhite.has(i)) sq.classList.add('danger-white');
+                    if (threatBlack === i) sq.classList.add('threat-black');
+                    if (bestWhiteSource === i) sq.classList.add('hint-blue');
+                    const p = this.g.board[i]; if (p) { sq.dataset.color = this.g.col(i); sq.textContent = this.SYM[p]; }
+                    sq.onclick = () => this.click(i); board.appendChild(sq);
+                }
+                this.updateSide();
+            }
+
+            click(i) {
+                if (this.g.turn !== 'w' || this.thinking) return;
+                this.playSfx('Click.ogg');
+                const mv = this.valid.find(m => m.t === i);
+                if (mv) {
+                    if (this.g.board[mv.f] === 'P' && Math.floor(i / 8) === 0) { this.pend = mv; document.getElementById('promo-modal').classList.remove('hidden'); return; }
+                    this.exec(mv, 'player');
+                } else {
+                    if (this.g.col(i) === 'w') { this.sel = i; this.valid = this.g.moves(i); }
+                    else { this.sel = null; this.valid = []; }
+                }
+                this.render();
+            }
+            promo(type) { this.pend.promo = type.toUpperCase(); document.getElementById('promo-modal').classList.add('hidden'); this.exec(this.pend, 'player'); this.pend = null; }
+
+            exec(m, who) {
+                /* Save snapshot before the move */
+                if (this.isRaid) this.g.saveSnapshot();
+
+                const scoreBefore = this.g.materialScore();
+                const isCapture = !!this.g.board[m.t] || !!m.ep;
+                this.g.apply(m);
+                this.last = m; this.sel = null; this.valid = [];
+                const scoreAfter = this.g.materialScore();
+                const scoreDiff = scoreAfter - scoreBefore;
+                const isCheck = this.g.inCheck(this.g.turn);
+
+                if (this.isRaid) {
+                    if (isCapture) this.playSfx(who === 'player' ? 'Attack.ogg' : 'Damage.ogg');
+                    else this.playSfx('Move.ogg');
+                    if (who === 'player') this.fx.onPlayerMove(m, scoreDiff, isCheck, isCapture, this.g);
+                    /* Update playback skill counter */
+                    if (this.playback) this.playback.onMovePlayed();
+                }
+
+                this.render();
+                const res = this.g.over();
+                if (res) this.endGame(res);
+                else if (who === 'player') setTimeout(() => this.aiMove(), 100);
+            }
+
+            aiMove() {
+                this.thinking = true;
+                document.getElementById('ai-card').classList.add('active-card');
+                document.getElementById('me-card').classList.remove('active-card');
+                document.getElementById('ai-status').innerHTML = '<span class="think-spinner"></span>Searching...';
+                document.getElementById('ai-status').classList.add('live');
+                document.getElementById('me-status').textContent = 'Waiting';
+                document.getElementById('me-status').classList.remove('live');
+                document.getElementById('depth-fill').style.width = '0%';
+                document.getElementById('depth-cur').textContent = '—';
+                document.getElementById('depth-elapsed').textContent = '—';
+                /* Raid mode: 6s search time; Normal: 4s */
+                const limit = this.isRaid ? 6000 : 4000;
+                this.worker.postMessage({ board: [...this.g.board], turn: this.g.turn, castle: { w: { ...this.g.castle.w }, b: { ...this.g.castle.b } }, ep: this.g.ep, half: this.g.half, full: this.g.full, timeLimitMs: limit });
+            }
+
+            onResult(move, depth) {
+                this.thinking = false;
+                if (move) {
+                    move.piece = this.g.board[move.f];
+                    if (this.isRaid) {
+                        setTimeout(() => { this.exec(move, 'ai'); this._afterAI(depth); }, 200);
+                    } else { this.exec(move, 'ai'); this._afterAI(depth); }
+                } else { this._afterAI(depth); }
+            }
+
+            _afterAI(depth) {
+                document.getElementById('ai-card').classList.remove('active-card');
+                document.getElementById('me-card').classList.add('active-card');
+                document.getElementById('ai-status').textContent = 'Idle (d' + depth + ')';
+                document.getElementById('ai-status').classList.remove('live');
+                document.getElementById('me-status').textContent = 'Your Turn';
+                document.getElementById('me-status').classList.add('live');
+                document.getElementById('depth-cur').textContent = 'depth ' + depth;
+            }
+
+            updateSide() {
+                document.getElementById('white-cap').innerHTML = '<div class="cap-label">Captured by you</div>' + this.g.captured.w.map(p => `<span>${this.SYM[p]}</span>`).join('');
+                document.getElementById('black-cap').innerHTML = '<div class="cap-label">Captured by AI</div>' + this.g.captured.b.map(p => `<span>${this.SYM[p]}</span>`).join('');
+                const list = document.getElementById('moves-list'); list.innerHTML = '';
+                const totalRows = Math.ceil(this.g.history.length / 2);
+                const startRow = Math.max(0, totalRows - 10);
+                for (let r = startRow; r < totalRows; r++) {
+                    const i = r * 2, row = document.createElement('div'); row.className = 'move-row';
+                    row.innerHTML = `<span>${r + 1}.</span><span>${this.note(this.g.history[i])}</span><span>${this.g.history[i + 1] ? this.note(this.g.history[i + 1]) : ''}</span>`;
+                    list.appendChild(row);
+                }
+                list.scrollTop = list.scrollHeight;
+                /* Update playback skill UI */
+                if (this.playback) this.playback.updateState();
+            }
+
+            note(m) { const f = 'abcdefgh'[m.t % 8], r = 8 - Math.floor(m.t / 8), p = m.piece && m.piece.toUpperCase() !== 'P' ? m.piece.toUpperCase() : ''; return `${p}${f}${r}`; }
+
+            endGame(res) {
+                document.getElementById('game-overlay').classList.remove('hidden');
+                /* Lock playback skill */
+                if (this.playback) this.playback.disable();
+                const isAIWin = res === 'checkmate' && this.g.turn === 'w';
+                const msgs = { checkmate: isAIWin ? (this.isRaid ? 'RETIRED (L)' : 'DEFEAT') : 'VICTORY', stalemate: 'STALEMATE', draw50: 'DRAW' };
+                const subs = { checkmate: isAIWin ? (this.isRaid ? 'Raid Overlord wins. GGWP' : 'You have been checkmated') : 'AI is checkmated', stalemate: 'No legal moves remain', draw50: '50-move rule' };
+                document.getElementById('end-msg').textContent = msgs[res] || 'DRAW';
+                document.getElementById('end-sub').textContent = subs[res] || res;
+                if (this.isRaid) {
+                    if (this.bgm) { this.bgm.pause(); this.bgm = null; }
+                    if (isAIWin) { this.fx.spawnComment('GG EZ', 'fc-danger'); this.fx.spawnComment('LULW', 'fc-danger'); this.fx.spawnComment('L + ratio', 'fc-danger'); this.fx.flashBoard('rgba(255,0,0,0.4)'); this.fx.shakeBoard(); this.fx.showBanner('GG WP', 4000); }
+                    else { this.fx.spawnComment('NOOOOOO', 'fc-rare'); this.fx.spawnComment('RIP AI', 'fc-rare'); this.fx.burstParticles(window.innerWidth / 2, window.innerHeight / 2, '#ffff00', 40); this.fx.showBanner('VICTORY', 4000); }
+                }
+            }
+            playSfx(file) { const s = new Audio(file); s.play().catch(() => { }); }
         }
-        list.scrollTop=list.scrollHeight;
-    }
-    note(m){const f='abcdefgh'[m.t%8],r=8-Math.floor(m.t/8),p=m.piece&&m.piece.toUpperCase()!=='P'?m.piece.toUpperCase():'';return`${p}${f}${r}`;}
-    endGame(res){
-        document.getElementById('game-overlay').classList.remove('hidden');
-        const msgs={checkmate:this.g.turn==='w'?'DEFEAT':'VICTORY',stalemate:'STALEMATE',draw50:'DRAW'};
-        const subs={checkmate:this.g.turn==='w'?'You have been checkmated':'AI is checkmated',stalemate:'No legal moves remain',draw50:'50-move rule'};
-        document.getElementById('end-msg').textContent=msgs[res]||'DRAW';
-        document.getElementById('end-sub').textContent=subs[res]||res;
-    }
-}
-new UI();
-</script>
+        new UI();
+    </script>
 </body>
+
 </html>
