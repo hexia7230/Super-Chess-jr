@@ -1268,49 +1268,177 @@
             opacity: 1;
         }
 
-        .floating-comment {
-            position: absolute;
-            white-space: nowrap;
-            font-family: 'DM Mono', monospace;
-            font-size: 1.4rem;
-            font-weight: 600;
+        /* Skill Cut-in overlay */
+        @keyframes cutinSlide {
+            0% { transform: translateX(-100%); opacity: 0; }
+            15% { transform: translateX(0); opacity: 1; }
+            75% { transform: translateX(0); opacity: 1; }
+            100% { transform: translateX(100%); opacity: 0; }
+        }
+        @keyframes cutinGlow {
+            0%,100% { box-shadow: 0 0 30px var(--ci-color,#00c8ff), inset 0 0 30px rgba(0,0,0,0.5); }
+            50% { box-shadow: 0 0 80px var(--ci-color,#00c8ff), 0 0 120px var(--ci-color,#00c8ff), inset 0 0 20px rgba(0,0,0,0.3); }
+        }
+        @keyframes cutinText {
+            0% { letter-spacing: 0.8rem; opacity: 0; transform: scale(0.7); }
+            20% { letter-spacing: 0.3rem; opacity: 1; transform: scale(1.05); }
+            80% { letter-spacing: 0.3rem; opacity: 1; transform: scale(1); }
+            100% { opacity: 0; }
+        }
+        @keyframes cutinSub {
+            0%,10% { opacity: 0; transform: translateY(8px); }
+            25% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        #skill-cutin {
+            position: fixed;
+            inset: 0;
+            z-index: 9000;
             pointer-events: none;
-            opacity: 0.9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
         }
-
-        .fc-normal {
-            color: #ffffff;
-            text-shadow: 0 0 8px rgba(0, 0, 0, 1), 2px 2px 0 #000, -1px -1px 0 #000;
+        .cutin-panel {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            padding: 1.6rem 3rem;
+            border-top: 2px solid var(--ci-color,#00c8ff);
+            border-bottom: 2px solid var(--ci-color,#00c8ff);
+            background: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.92) 15%, rgba(0,0,0,0.92) 85%, transparent 100%);
+            animation: cutinSlide 1.8s cubic-bezier(0.16,1,0.3,1) forwards, cutinGlow 1.8s ease-in-out;
+            text-align: center;
         }
-
-        .fc-rare {
-            color: #00ffff;
-            font-size: 1.8rem;
-            text-shadow: 0 0 12px rgba(0, 255, 255, 0.8), 2px 2px 0 #000;
+        .cutin-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, var(--ci-color,#00c8ff), transparent);
+            opacity: 0.06;
         }
-
-        .fc-danger {
-            color: #ff00ff;
-            text-shadow: 0 0 12px rgba(255, 0, 255, 0.8), 2px 2px 0 #000;
+        .cutin-who {
+            font-size: 0.5rem;
+            letter-spacing: 0.45rem;
+            text-transform: uppercase;
+            color: var(--ci-color,#00c8ff);
+            margin-bottom: 0.3rem;
+            opacity: 0.8;
         }
-
-        .fc-mega {
-            color: #ffff00;
-            font-size: 2.4rem;
-            text-shadow: 0 0 20px rgba(255, 255, 0, 0.9), 3px 3px 0 #000, -1px -1px 0 #444;
+        .cutin-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2.2rem,6vw,3.5rem);
+            font-weight: 700;
+            letter-spacing: 0.3rem;
+            text-transform: uppercase;
+            color: #fff;
+            text-shadow: 0 0 30px var(--ci-color,#00c8ff), 0 0 60px var(--ci-color,#00c8ff);
+            animation: cutinText 1.8s ease forwards;
+            position: relative;
+            z-index: 1;
         }
-
-        .fc-god {
-            color: #ff8800;
-            font-size: 2.8rem;
-            text-shadow: 0 0 25px rgba(255, 136, 0, 1), 0 0 50px rgba(255, 0, 0, 0.5), 3px 3px 0 #000;
+        .cutin-desc {
+            font-size: 0.7rem;
+            letter-spacing: 0.15rem;
+            color: var(--ci-color,#00c8ff);
+            margin-top: 0.4rem;
+            animation: cutinSub 1.8s ease forwards;
+            position: relative;
+            z-index: 1;
         }
+        .cutin-scanline {
+            position: absolute;
+            left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--ci-color,#00c8ff), transparent);
+            animation: cutinSub 1.8s ease forwards;
+        }
+        .cutin-scanline.top { top: 8px; }
+        .cutin-scanline.bot { bottom: 8px; }
 
         .particle {
             position: absolute;
             border-radius: 50%;
             pointer-events: none;
             animation: particleFly 0.8s ease-out forwards;
+        }
+
+        /* ── ENEMY SKILL EFFECTS ── */
+        #mist-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 15;
+            pointer-events: none;
+            background: repeating-linear-gradient(0deg,rgba(80,0,120,0.18) 0px,rgba(150,0,220,0.08) 2px,transparent 4px);
+            backdrop-filter: blur(2px);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        #mist-overlay.active { opacity: 1; }
+
+        #dark-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 8500;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s;
+            overflow: hidden;
+        }
+        #dark-overlay.active { opacity: 1; }
+
+        .sq.skill-fill {
+            background: #1a0030 !important;
+            cursor: not-allowed;
+        }
+        .sq.skill-fill::after {
+            content: '■';
+            position: absolute;
+            color: rgba(170,0,255,0.7);
+            font-size: 1.6em;
+            pointer-events: none;
+            z-index: 20;
+        }
+        .sq.skill-lock::before {
+            content: '🔒';
+            position: absolute;
+            top: 2px; right: 2px;
+            font-size: 0.5em;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        /* ── RAID RANK DISPLAY ── */
+        #raid-rank-wrap {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            padding: 0.5rem 0.8rem;
+            background: rgba(255, 0, 255, 0.06);
+            border: 1px solid rgba(255, 0, 255, 0.25);
+            border-radius: 4px;
+        }
+        body.raid-mode #raid-rank-wrap { display: flex; }
+        .raid-rank-label {
+            font-size: 0.48rem;
+            letter-spacing: 0.28rem;
+            text-transform: uppercase;
+            color: rgba(255, 0, 255, 0.55);
+        }
+        #raid-rank-val {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ff44ff;
+            text-shadow: 0 0 8px rgba(255,0,255,0.7);
+            line-height: 1;
+        }
+        #raid-rank-pts {
+            font-size: 0.55rem;
+            color: rgba(255,0,255,0.5);
+            letter-spacing: 0.1rem;
         }
 
         #board-flash {
@@ -1556,7 +1684,9 @@
                 <div class="start-btns">
                     <button class="start-btn" id="start-btn"><span>BEGIN GAME</span></button>
                     <button class="start-btn raid-btn" id="raid-btn"><span>RAID MODE</span></button>
+                    <button class="start-btn" id="reset-rank-btn" style="border-color:rgba(255,100,100,0.4);color:#ff6666;font-size:0.6rem;padding:0.6rem 1.5rem;margin-top:0.5rem;"><span>RESET RAID RANK</span></button>
                 </div>
+                <div id="rank-display-title" style="margin-top:1rem;font-size:0.6rem;letter-spacing:0.25rem;color:rgba(255,0,255,0.5);text-align:center;"></div>
             </div>
         </section>
 
@@ -1590,6 +1720,7 @@
                 <div class="board-wrap" id="board-wrap">
                     <div id="chess-board"></div>
                     <div id="board-flash"></div>
+                    <div id="mist-overlay"></div>
                     <div id="game-overlay" class="hidden">
                         <div class="over-content">
                             <h2 id="end-msg">DRAW</h2>
@@ -1614,6 +1745,12 @@
                         <div id="raid-timer-bar-track">
                             <div id="raid-timer-bar"></div>
                         </div>
+                    </div>
+                    <!-- RAID RANK (Raid Mode only) -->
+                    <div id="raid-rank-wrap">
+                        <div class="raid-rank-label">Raid Rank</div>
+                        <div id="raid-rank-val">NOVICE</div>
+                        <div id="raid-rank-pts">0 pts</div>
                     </div>
                     <!-- SKILL BUTTONS (Raid Mode only) -->
                     <div class="skill-row" id="skill-row" style="display:none;">
@@ -1665,6 +1802,10 @@
         </section>
     </div>
 
+    <!-- SKILL CUT-IN -->
+    <div id="skill-cutin"></div>
+    <!-- DARK OVERLAY -->
+    <div id="dark-overlay"></div>
     <!-- RAID LAYER -->
     <div id="raid-layer">
         <div id="raid-scan"></div>
@@ -2039,6 +2180,7 @@ self.onmessage=function(e){
                 this.turnsPlayed = 0;
                 this.lastUsedAt = -999;
                 this.disabled = false; // game-over lock
+                this.enemyTurn = false; // locked during AI turn
                 this.btn = document.getElementById('playback-btn');
                 this.label = document.getElementById('playback-label');
                 this.arc = document.getElementById('playback-arc');
@@ -2052,6 +2194,21 @@ self.onmessage=function(e){
             onRewindUsed() {
                 this.lastUsedAt = this.turnsPlayed;
                 this.turnsPlayed = Math.max(0, this.turnsPlayed - 2);
+                this.updateState();
+            }
+
+            /** Called when timer expires: reset cooldown */
+applyTimerPenalty() {
+    if (this.disabled) return;
+
+
+    this.lastUsedAt = this.turnsPlayed;
+
+    this.updateState();
+}
+            /** Call when enemy starts thinking; call again with false when player's turn resumes */
+            setEnemyTurn(isEnemy) {
+                this.enemyTurn = isEnemy;
                 this.updateState();
             }
 
@@ -2073,11 +2230,19 @@ self.onmessage=function(e){
             }
 
             get isReady() {
-                return !this.disabled && this.isUnlocked && this.cooldownRemaining === 0;
+                return !this.disabled && !this.enemyTurn && this.isUnlocked && this.cooldownRemaining === 0;
             }
 
             updateState() {
                 if (this.disabled) return;
+
+                // Disable button entirely during enemy (AI) turn
+                if (this.enemyTurn) {
+                    this.btn.disabled = true;
+                    this.btn.classList.remove('ready');
+                    this.label.textContent = 'Enemy turn...';
+                    return;
+                }
 
                 if (!this.isUnlocked) {
                     this.btn.disabled = true;
@@ -2136,27 +2301,28 @@ self.onmessage=function(e){
                 this.layer = document.getElementById('raid-layer');
                 this.combo = 0;
                 this.comboTimer = null;
-                this.commentTimers = [];
-                this.GENERIC = ["GLHF", "Watching u", "Nice board", "Is that it?", "Hmm", "Calculated", "OmegaLUL", "GG?", "Hurry up", "Sub to me!", "1.2M watching", "Big brain time", "PepeHands", "Kreygasm", "EZ Clap", "MonkaS", "RIP", "PogU", "PogChamp", "KEKW", "YEP", "WTF", "who is this guy", "speedrun?", "AI > Human", "classic beginner", "visible confusion", "is this a bot?", "throwing?", "400IQ", "nooo", "OMEGALUL", "4Head", "wait what", "not like this", "ResidentSleeper", "BibleThump", "Kappa", "forsenCD", "DansGame", "PauseChamp", "catJAM", "GIGACHAD MOVE?", "I'm scared", "oh no", "gg early", "LUL", "chat is this real?", "mods ban him", "how is this legal", "chess god?", "???", "!!", "Clueless", "Aware", "ICANT", "Donation: $5 - Skill issue", "Hydrate!", "Ads incoming...", "I missed the play", "Classic chat", "Any gifters?", "Poggers", "5Head", "Imagine losing", "Skill match", "Pure RNG", "Top 10 moments", "Video idea?", "Clickbait", "Sus", "Amogus?", "No cap", "For real for real", "Sheesh", "Bet", "Mid play", "Ratio", "Cope", "Seethe", "Mald", "git gud", "Who invited this guy?", "Main character energy", "Anime plot armor?", "I was here", "PogChamp in chat!", "VIP when?", "Stream sniper?", "Lag?", "F in the chat", "WidePeepoHappy", "Sadge", "Pepega", "WutFace", "Jebaited", "Galaxy brain", "Thinking emoji", "Fire", "Lit", "Drip", "Fr", "Slay", "King energy", "Wait for it", "Wait for the drop", "Calculated risk", "Choke?", "Is it Joever?", "We are so back", "Trust the process", "Scripted", "Rigged", "Hacks", "Reported", "Aimbot for chess?", "Stockfish?", "I see it", "He doesn't see it", "Tunnel vision", "Check the engine", "Eval bar update", "Blunder incoming", "Move of the century", "Cooking", "Let him cook", "He's cooking", "Chef's kiss", "Garbage", "Delete the game", "Uninstall", "Rage quit?", "Oof", "Big oof", "Yikes", "Soul read", "Mind games", "Psychological warfare", "ASMR Chess", "Satisfying", "Smooth", "Like butter", "Clean", "TACTICAL", "Strategic", "Philosophical move", "Clip it!", "Clip that!", "Absolute CINEMA"];
-                this.BLUNDER = ["FATAL BLUNDER!!", "NOOO", "BAD MOVE LUL", "RIP", "you just lost", "GG EZ", "L + blunder", "bro...", "that's rough", "OhMyDog", "D:", "OMEGALUL", "why would you do that", "BibleThump", "chat he's cooked", "What was that?", "Terrible!", "Absolute garbage", "Throwing!!", "Are you blind?", "Classic blunder", "My eyes!!", "Delete this", "I can't watch", "Pain", "Bruh moment", "L move", "Big L", "Massive L", "Ratioed by engine", "Eval bar died", "Negative aura", "Bot behavior", "Lower than 100 ELO", "My cat moves better", "Zero IQ", "Smooth brain", "Brain lag", "Disconnected", "Report AI for bullying", "Stop the count!", "Tilted", "Hard tilted", "So bad", "F-tier move", "Plastic rank", "Wood player", "Shameful", "Dishonor", "Unlucky", "Copium", "Need more copium", "Seethe", "Mald", "Cry about it", "Skill issue detected", "Git gud kid", "Go back to checkers", "Undos when?", "Mouse slip?", "Misclick?", "Worst move ever", "Historical blunder", "Museum of failures", "Hall of Shame", "Top 10 fails", "Funny moments", "COOKED"];
-                this.GOODMOVE = ["GOD MOVE!!", "INSANE!!", "W player", "PogChamp", "YOOO", "CRISPY", "big brain", "that was clean", "Pog", "BASED", "monkaW", "HOW", "genius??", "SHEEEESH", "chat did u see that?", "LETSGO", "cracked", "no way", "HACKUSATION", "EZ", "that's the play", "SICKO MODE", "Brilliant!", "Absolute cinema", "Masterclass", "Magnus?", "AlphaZero?", "Grandmaster energy", "Peak chess", "Holy hell!", "Google en passant", "Goat", "W move", "Major W", "Huge W", "Chef's kiss", "Pure gold", "Diamond play", "Star player", "Carry", "Main character", "Scripted victory", "Aura +1000", "Maximum rizz", "Chess god mode", "Unstoppable", "In the zone", "Mind blowing", "Brain expanded", "1000 IQ", "Forbidden move", "Secret technique", "Hidden talent", "Found it!", "The only move", "Best choice", "Perfect", "Flawless", "Elegant", "Elite", "High ELO move", "Pro level", "Clip it now!", "Viral moment", "Ultra instinct", "Super Saiyan", "Kaioken", "Simply better", "Different breed", "Built different", "Skill diff"];
-                this.CHECK = ["CHECK!!", "👑 in danger", "RUN KING RUN", "check check check", "EZ CHECK", "king on the run", "monkaS", "PauseChamp", "KINGSAFETY", "CHAT he's in check", "Danger Zone", "Target locked", "Nowhere to hide", "King is sweating", "Nervous king", "Call an ambulance!", "Assassination attempt", "Sniper!", "King's castle is falling", "Defenses breached", "Intruder!", "Red alert!", "Panic!", "Sike!", "Gotcha", "Checkmate soon?", "Almost dead", "One life left", "Final boss phase 2", "Pressure!", "Under pressure", "Ticking time bomb", "Boom!", "Checkmate loading...", "King in the mud", "Nasty check"];
-                this.CAPTURE = ["CAPTURED!", "om nom nom", "got em", "trade accepted", "material acquired", "piece taken", "sacrifice??", "bro lost a piece", "rip piece", "Hungry for pieces", "Piece delicious", "Yum", "Munch", "Crunch", "Delete piece", "Piece.exe not found", "Gone", "Reduced to atoms", "Vanished", "Stolen", "Robbed", "Looted", "Material advantage", "Winning the trade", "Stonks", "Economy boost", "Gold lead", "Numerical superiority", "Clean take", "Snipped", "Removed", "Evicted", "Owned", "Pwned", "Rekt", "Destroyed", "Demolished", "Annihilated", "Obliterated", "Exterminated", "Fallen soldier", "Press F"];
-                this.REWIND = ["REWIND?!", "TIME MANIPULATION", "Wait what??", "ILLEGAL??", "Chat he used time!", "BackInTime", "Undo master", "Cheat code?", "Ctrl+Z activated", "That move didn't happen", "404: move not found", "Temporal hack!", "Reverse card!", "PauseChamp time reversal", "CHEATER!!! (jk)", "Time Loop activated", "Back to the future!", "Clock manipulation??", "He rewound!", "Time warp LUL"];
                 this.lastPieceTargetIdx = null;
             }
-            spawnComment(text, type = 'fc-normal') {
-                const el = document.createElement('div');
-                el.className = `floating-comment ${type}`;
-                el.textContent = text;
-                const top = 40 + Math.random() * (window.innerHeight - 120);
-                el.style.cssText = `top:${top}px;left:110vw;`;
-                this.layer.appendChild(el);
-                const duration = 5000 + Math.random() * 4000;
-                const dist = window.innerWidth + 600;
-                el.animate([{ transform: 'translateX(0)', opacity: 0.9 }, { transform: `translateX(-${dist}px)`, opacity: 0.7 }], { duration, easing: 'linear' }).onfinish = () => el.remove();
-                setTimeout(() => { if (el.parentNode) el.remove(); }, duration + 100);
+
+            showCutIn(name, desc, who='player') {
+                /* who: 'player'=cyan, 'enemy'=magenta */
+                const color = who === 'enemy' ? '#ff00ff' : '#00c8ff';
+                const whoLabel = who === 'enemy' ? 'ENEMY SKILL' : 'SKILL ACTIVATE';
+                const container = document.getElementById('skill-cutin');
+                container.innerHTML = '';
+                const panel = document.createElement('div');
+                panel.className = 'cutin-panel';
+                panel.style.setProperty('--ci-color', color);
+                panel.innerHTML = `
+                    <div class="cutin-scanline top"></div>
+                    <div class="cutin-who">${whoLabel}</div>
+                    <div class="cutin-name">${name}</div>
+                    <div class="cutin-desc">${desc}</div>
+                    <div class="cutin-scanline bot"></div>`;
+                container.appendChild(panel);
+                setTimeout(() => { if (panel.parentNode) panel.remove(); }, 1900);
             }
+
             burstParticles(x, y, color = '#ff00ff', count = 12) {
                 for (let i = 0; i < count; i++) {
                     const p = document.createElement('div');
@@ -2185,7 +2351,6 @@ self.onmessage=function(e){
                 clearTimeout(this.comboTimer);
                 this.comboTimer = setTimeout(() => this.resetCombo(), 10000);
                 this.updateComboDisplay();
-                if (this.combo >= 2) this.spawnComment(`${this.combo}x PIECE COMBO!!`, 'fc-mega');
             }
             resetCombo() { this.combo = 0; this.lastPieceTargetIdx = null; this.updateComboDisplay(); }
             updateComboDisplay() {
@@ -2205,34 +2370,297 @@ self.onmessage=function(e){
             }
             onPlayerMove(m, scoreDiff, isCheck, isCapture, g) {
                 const pos = this.getSquareCenter(m.t);
-                if (isCapture) { this.incrementCombo(m); this.spawnComment(this.pick(this.CAPTURE), 'fc-rare'); this.burstParticles(pos.x, pos.y, '#00ffff', 10); } else this.resetCombo();
-                if (isCheck) { this.spawnComment(this.pick(this.CHECK), 'fc-danger'); this.burstParticles(pos.x, pos.y, '#ff0000', 16); this.flashBoard('rgba(255,0,0,0.25)'); this.shakeBoard(); this.showBanner('CHECK!'); }
-                if (scoreDiff <= -300) { this.spawnComment(this.pick(this.BLUNDER), 'fc-danger'); this.burstParticles(pos.x, pos.y, '#ff0000', 20); this.flashBoard('rgba(255,0,0,0.3)'); this.shakeBoard(); }
-                else if (scoreDiff <= -80) { this.spawnComment(this.pick(this.BLUNDER), 'fc-danger'); this.flashBoard('rgba(255,50,0,0.15)'); }
-                else if (scoreDiff >= 300) { this.spawnComment(this.pick(this.GOODMOVE), 'fc-god'); this.burstParticles(pos.x, pos.y, '#ffff00', 24); this.flashBoard('rgba(0,255,150,0.2)'); this.showBanner('BRILLIANT!'); }
-                else if (scoreDiff >= 80) { this.spawnComment(this.pick(this.GOODMOVE), 'fc-rare'); this.burstParticles(pos.x, pos.y, '#00ff88', 10); }
+                if (isCapture) { this.incrementCombo(m); this.burstParticles(pos.x, pos.y, '#00ffff', 10); } else this.resetCombo();
+                if (isCheck) { this.burstParticles(pos.x, pos.y, '#ff0000', 16); this.flashBoard('rgba(255,0,0,0.25)'); this.shakeBoard(); this.showBanner('CHECK!'); }
+                if (scoreDiff <= -300) { this.burstParticles(pos.x, pos.y, '#ff0000', 20); this.flashBoard('rgba(255,0,0,0.3)'); this.shakeBoard(); }
+                else if (scoreDiff >= 300) { this.burstParticles(pos.x, pos.y, '#ffff00', 24); this.flashBoard('rgba(0,255,150,0.2)'); this.showBanner('BRILLIANT!'); }
+                else if (scoreDiff >= 80) { this.burstParticles(pos.x, pos.y, '#00ff88', 10); }
             }
             onAIMove(m, g) {
                 const pos = this.getSquareCenter(m.t);
                 this.burstParticles(pos.x, pos.y, '#ff00ff', 8);
-                if (g.inCheck('w')) { this.spawnComment('AI says check! HA!', 'fc-danger'); this.flashBoard('rgba(255,0,255,0.2)'); this.shakeBoard(); }
+                if (g.inCheck('w')) { this.flashBoard('rgba(255,0,255,0.2)'); this.shakeBoard(); }
             }
             onRewind(boardCenter) {
-                for (let i = 0; i < 6; i++) this.spawnComment(this.pick(this.REWIND), i % 2 === 0 ? 'fc-rare' : 'fc-danger');
                 this.burstParticles(boardCenter.x, boardCenter.y, '#00ffff', 30);
                 this.flashBoard('rgba(0,255,255,0.35)');
                 this.shakeBoard();
                 this.showBanner('TIME REVERSED', 2000);
             }
-            startIdleLoop() {
-                const loop = () => {
-                    const delay = 2000 + Math.random() * 4000;
-                    this.commentTimers.push(setTimeout(() => { this.spawnComment(this.pick(this.GENERIC), 'fc-normal'); loop(); }, delay));
-                };
-                loop();
-            }
-            stopIdleLoop() { this.commentTimers.forEach(t => clearTimeout(t)); this.commentTimers = []; }
             pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+        }
+
+        /* ══════════════ ENEMY SKILL SYSTEM ══════════════ */
+        class EnemySkillSystem {
+            constructor(ui) {
+                this.ui = ui;
+                this.MAX_CD = 10;
+                this.cd = 0;  // current cooldown points
+                this.active = { mist: 0, fillIdx: null, lockIdx: null, fadeIdx: null, dark: 0 };
+                this._darkInterval = null;
+                this.skillDefs = {
+                    mist:  { cost: 5,  duration: 2, label: 'MIST',  desc: 'Enemy pieces are obscured' },
+                    fill:  { cost: 5,  duration: 1, label: 'FILL',  desc: 'A square is blocked' },
+                    lock:  { cost: 10, duration: 1, label: 'LOCK',  desc: 'A piece is immovable' },
+                    fade:  { cost: 6,  duration: 2, label: 'FADE',  desc: 'A piece turns invisible' },
+                    dark:  { cost: 4,  duration: 2, label: 'DARK',  desc: 'Vision is obscured' },
+                };
+            }
+
+            reset() {
+                this.cd = 0;
+                this.active = { mist: 0, fillIdx: null, lockIdx: null, fadeIdx: null, dark: 0 };
+                this._stopDark();
+                document.getElementById('mist-overlay').classList.remove('active');
+            }
+
+            onTurn() {
+                /* Gain 1 CD per turn, max 10 */
+                this.cd = Math.min(this.MAX_CD, this.cd + 1);
+                /* Tick down active skill durations */
+                if (this.active.mist > 0) { this.active.mist--; if (this.active.mist === 0) document.getElementById('mist-overlay').classList.remove('active'); }
+                if (this.active.fillIdx !== null) this.active.fillIdx = null;
+                if (this.active.lockIdx !== null) this.active.lockIdx = null;
+                if (this.active.fadeIdx !== null) this.active.fadeIdx = null;
+                if (this.active.dark > 0) { this.active.dark--; if (this.active.dark === 0) this._stopDark(); }
+            }
+
+            /* Called after AI search, before AI moves. Returns delay ms if skill fires. */
+            tryActivate(g) {
+                const rank = this.ui.raidRank ? this.ui.raidRank.points : 0;
+                const candidates = this._evaluateCandidates(g, rank);
+                if (candidates.length === 0) return 0;
+                const chosen = candidates[0]; // {id, score, target?}
+                const def = this.skillDefs[chosen.id];
+                if (!def || this.cd < def.cost) return 0;
+                /* Don't always fire immediately; save up based on rank */
+                const saveThreshold = rank < 5 ? 0.5 : rank < 15 ? 0.65 : 0.8;
+                if (Math.random() > saveThreshold) return 0;
+                return this._activate(chosen.id, g, chosen);
+            }
+
+            _evaluateCandidates(g, rank) {
+                const candidates = [];
+                /* Dark: always useful early, low cost */
+                if (this.active.dark === 0 && this.cd >= this.skillDefs.dark.cost) {
+                    candidates.push({ id: 'dark', score: 40 + rank * 2 });
+                }
+                /* Mist: useful when AI has many pieces */
+                const blackPieceCount = g.board.filter((p, i) => g.col(i) === 'b').length;
+                if (this.active.mist === 0 && this.cd >= this.skillDefs.mist.cost && blackPieceCount >= 4) {
+                    candidates.push({ id: 'mist', score: 30 + blackPieceCount * 5 });
+                }
+                /* Fade: hide a valuable piece that player might target */
+                if (this.active.fadeIdx === null && this.cd >= this.skillDefs.fade.cost) {
+                    const target = this._findFadeTarget(g);
+                    if (target !== null) candidates.push({ id: 'fade', score: 50, target });
+                }
+                /* Fill: block a square the player wants to move to */
+                if (this.active.fillIdx === null && this.cd >= this.skillDefs.fill.cost) {
+                    const sq = this._findFillTarget(g);
+                    if (sq !== null) candidates.push({ id: 'fill', score: 45, target: sq });
+                }
+                /* Lock: only at higher rank, locks the player's most valuable movable piece */
+                if (rank >= 10 && this.active.lockIdx === null && this.cd >= this.skillDefs.lock.cost) {
+                    const target = this._findLockTarget(g);
+                    if (target !== null) candidates.push({ id: 'lock', score: 70, target });
+                }
+                candidates.sort((a, b) => b.score - a.score);
+                return candidates.map(c => Object.assign({}, c));
+            }
+
+            _findFadeTarget(g) {
+                /* Find a black piece (AI) that the player could capture */
+                const MAT = { p: 100, n: 325, b: 350, r: 525, q: 1000, k: 20000 };
+                let best = null, bestVal = 0;
+                const whiteMoves = g.allMoves('w');
+                for (const m of whiteMoves) {
+                    if (g.board[m.t] && g.col(m.t) === 'b') {
+                        const val = MAT[g.board[m.t].toLowerCase()] || 0;
+                        if (val > bestVal) { bestVal = val; best = m.t; }
+                    }
+                }
+                return bestVal > 200 ? best : null;
+            }
+
+            _findFillTarget(g) {
+                /* Block a square that would be good for player to move to */
+                const whiteMoves = g.allMoves('w');
+                const MAT = { p: 100, n: 325, b: 350, r: 525, q: 1000, k: 20000 };
+                let best = null, bestScore = 0;
+                for (const m of whiteMoves) {
+                    if (g.board[m.t]) continue; // only empty squares
+                    const sim = g.copy(); sim.apply(m, true);
+                    const gain = sim.materialScore() - g.materialScore();
+                    if (gain > bestScore) { bestScore = gain; best = m.t; }
+                }
+                /* Also consider squares that would put black king in check */
+                return bestScore > 0 ? best : (whiteMoves.length > 0 ? whiteMoves[Math.floor(Math.random()*whiteMoves.length)].t : null);
+            }
+
+            _findLockTarget(g) {
+                /* Lock the player's most valuable piece that can still move */
+                const MAT = { p: 100, n: 325, b: 350, r: 525, q: 1000, k: 0 };
+                let best = null, bestVal = 0;
+                for (let i = 0; i < 64; i++) {
+                    if (g.col(i) !== 'w') continue;
+                    const val = MAT[g.board[i].toLowerCase()] || 0;
+                    if (val > bestVal && g.moves(i).length > 0) {
+                        /* Make sure locking doesn't leave zero movable pieces */
+                        const others = [0];
+                        let otherMoves = 0;
+                        for (let j = 0; j < 64; j++) {
+                            if (j !== i && g.col(j) === 'w') otherMoves += g.moves(j).length;
+                        }
+                        if (otherMoves > 0) { bestVal = val; best = i; }
+                    }
+                }
+                return best;
+            }
+
+            _activate(skillId, g, cand) {
+                const def = this.skillDefs[skillId];
+                if (!def) return 0;
+
+                this.cd -= def.cost;
+                this.ui.playSfx('Move.mp3');
+                this.ui.fx.showCutIn(def.label, def.desc, 'enemy');
+
+                const delay = 1900; // wait for cutin
+
+                setTimeout(() => {
+                    if (skillId === 'mist') {
+                        this.active.mist = def.duration + 1;
+                        document.getElementById('mist-overlay').classList.add('active');
+                        this.ui.fx.flashBoard('rgba(100,0,180,0.3)');
+                    } else if (skillId === 'fill') {
+                        const fillSq = (cand && cand.target !== undefined) ? cand.target : this._findFillTarget(g);
+                        if (fillSq !== null && fillSq !== undefined) this.active.fillIdx = fillSq;
+                        this.ui.fx.flashBoard('rgba(100,0,180,0.3)');
+                    } else if (skillId === 'lock') {
+                        const lockSq = (cand && cand.target !== undefined) ? cand.target : this._findLockTarget(g);
+                        if (lockSq !== null && lockSq !== undefined) this.active.lockIdx = lockSq;
+                        this.ui.fx.flashBoard('rgba(255,0,100,0.3)');
+                    } else if (skillId === 'fade') {
+                        const fadeSq = (cand && cand.target !== undefined) ? cand.target : this._findFadeTarget(g);
+                        if (fadeSq !== null && fadeSq !== undefined) this.active.fadeIdx = fadeSq;
+                        this.ui.fx.flashBoard('rgba(100,0,180,0.25)');
+                    } else if (skillId === 'dark') {
+                        this.active.dark = def.duration + 1;
+                        this._startDark();
+                        this.ui.fx.flashBoard('rgba(0,0,0,0.5)');
+                    }
+                    this.ui.render();
+                }, delay);
+
+                return delay;
+            }
+
+            _startDark() {
+                const overlay = document.getElementById('dark-overlay');
+                overlay.classList.add('active');
+                this._stopDark();
+                /* Matrix rain canvas */
+                overlay.innerHTML = '';
+                const canvas = document.createElement('canvas');
+                canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+                canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
+                overlay.appendChild(canvas);
+                const ctx = canvas.getContext('2d');
+                const cols = Math.floor(canvas.width / 16);
+                const drops = Array(cols).fill(1);
+                const chars = '日ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ0123456789ABCDEF';
+                this._darkInterval = setInterval(() => {
+                    ctx.fillStyle = 'rgba(0,0,0,0.05)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#0f0';
+                    ctx.font = '14px monospace';
+                    for (let i = 0; i < drops.length; i++) {
+                        const c = chars[Math.floor(Math.random() * chars.length)];
+                        ctx.fillText(c, i * 16, drops[i] * 16);
+                        if (drops[i] * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                        drops[i]++;
+                    }
+                }, 50);
+            }
+
+            _stopDark() {
+                if (this._darkInterval) { clearInterval(this._darkInterval); this._darkInterval = null; }
+                const overlay = document.getElementById('dark-overlay');
+                overlay.classList.remove('active');
+                overlay.innerHTML = '';
+            }
+        }
+
+        /* ══════════════ RAID RANK SYSTEM ══════════════ */
+        class RaidRankSystem {
+            constructor() {
+                this._load();
+            }
+
+            _load() {
+                try {
+                    const data = JSON.parse(localStorage.getItem('raidRankData') || '{}');
+                    this.points = data.points || 0;
+                    this.wins = data.wins || 0;
+                    /* Learning: store patterns of moves that beat the AI */
+                    this.learnedPatterns = data.learnedPatterns || [];
+                } catch(e) {
+                    this.points = 0; this.wins = 0; this.learnedPatterns = [];
+                }
+            }
+
+            _save() {
+                try {
+                    localStorage.setItem('raidRankData', JSON.stringify({
+                        points: this.points,
+                        wins: this.wins,
+                        learnedPatterns: this.learnedPatterns.slice(-50) // keep last 50
+                    }));
+                } catch(e) {}
+            }
+
+            reset() {
+                this.points = 0; this.wins = 0; this.learnedPatterns = [];
+                try { localStorage.removeItem('raidRankData'); } catch(e) {}
+            }
+
+            recordWin(g) {
+                this.wins++;
+                /* Points based on difficulty (rank level) */
+                const basePoints = 10;
+                const difficultyBonus = Math.floor(this.points / 10);
+                const pts = basePoints + difficultyBonus;
+                this.points += pts;
+
+                /* Learn the move pattern: record the last 10 moves */
+                const history = g.history || [];
+                if (history.length >= 4) {
+                    const pattern = history.slice(-10).map(m => ({ f: m.f, t: m.t, piece: m.piece }));
+                    this.learnedPatterns.push({ pattern, pts, rank: this.getRankName() });
+                }
+
+                this._save();
+                return pts;
+            }
+
+            getRankName() {
+                const p = this.points;
+                if (p < 10) return 'NOVICE';
+                if (p < 30) return 'SOLDIER';
+                if (p < 60) return 'HUNTER';
+                if (p < 100) return 'ELITE';
+                if (p < 150) return 'VETERAN';
+                if (p < 220) return 'MASTER';
+                if (p < 320) return 'GRAND MASTER';
+                return 'LEGEND';
+            }
+
+            /* Returns info for enemy skill AI to make smarter decisions */
+            getAdaptiveBonus() {
+                /* Returns 0-1: how much to scale AI aggressiveness */
+                return Math.min(1, this.points / 100);
+            }
         }
 
         /* ══════════════ UI ══════════════ */
@@ -2250,7 +2678,11 @@ self.onmessage=function(e){
                 this._timerSec = 5;
                 this._timerMaxSec = 5;
                 this._timerRunning = false;
-                this._firstMove = true;     // first player move: timer disabled
+                this._firstMove = true;
+                /* Enemy skill system */
+                this.enemySkills = new EnemySkillSystem(this);
+                /* Raid Rank system */
+                this.raidRank = new RaidRankSystem();
                 this.bind();
                 this.buildWorker();
             }
@@ -2273,7 +2705,24 @@ self.onmessage=function(e){
                 document.getElementById('start-btn').onclick = () => { click(); this.start(false); };
                 document.getElementById('raid-btn').onclick = () => { click(); this.start(true); };
                 document.getElementById('restart-btn').onclick = () => { click(); location.reload(); };
+                document.getElementById('reset-rank-btn').onclick = () => {
+                    click();
+                    if (confirm('Reset Raid Rank and all learning data?')) {
+                        this.raidRank.reset();
+                        this._updateRankTitle();
+                        alert('Raid Rank reset complete.');
+                    }
+                };
                 document.querySelectorAll('.promo-opt').forEach(o => o.onclick = () => { click(); this.promo(o.dataset.p); });
+                this._updateRankTitle();
+            }
+            _updateRankTitle() {
+                const el = document.getElementById('rank-display-title');
+                if (el) {
+                    const pts = this.raidRank.points;
+                    const rank = this.raidRank.getRankName();
+                    el.textContent = pts > 0 ? `RAID RANK: ${rank} — ${pts} pts` : '';
+                }
             }
             start(raid) {
                 this.isRaid = raid;
@@ -2290,15 +2739,22 @@ self.onmessage=function(e){
                     this.playback = new PlaybackSkill();
                     this.playback.updateState();
                     document.getElementById('playback-btn').onclick = () => this.doPlayback();
-
+                    /* Reset enemy skills for new game */
+                    this.enemySkills.reset();
+                    /* Show rank in game UI */
+                    this._updateGameRankUI();
                     this.bgm = new Audio('BGM_Raid.mp3');
                     this.bgm.loop = true;
                     this.bgm.play().catch(() => { });
-                    this.fx.startIdleLoop();
                     this.fx.showBanner('RAID MODE ACTIVATED', 3000);
-                    setTimeout(() => { for (let i = 0; i < 8; i++) setTimeout(() => this.fx.spawnComment(['RAID START!', 'Lurking', 'OMEGALUL', 'Pog', 'GLHF', 'LUL', 'KEKW', 'monkaS'][i], 'fc-' + (i % 2 === 0 ? 'rare' : 'normal')), i * 300); }, 500);
                 }
                 this.render();
+            }
+            _updateGameRankUI() {
+                const rankEl = document.getElementById('raid-rank-val');
+                const ptsEl = document.getElementById('raid-rank-pts');
+                if (rankEl) rankEl.textContent = this.raidRank.getRankName();
+                if (ptsEl) ptsEl.textContent = `${this.raidRank.points} pts`;
             }
 
             doPlayback() {
@@ -2310,6 +2766,8 @@ self.onmessage=function(e){
 
                 this.playSfx('Move.mp3');
                 setTimeout(() => this.playSfx('Click.mp3'), 150);
+                /* Cut-in for Playback skill */
+                this.fx.showCutIn('PLAYBACK', 'Rewinding 1 turn', 'player');
 
                 /* VFX */
                 const board = document.getElementById('chess-board'), rect = board.getBoundingClientRect();
@@ -2355,6 +2813,8 @@ self.onmessage=function(e){
                     this._updateTimerUI();
                     if (this._timerSec <= 0) {
                         this.stopRaidTimer();
+                        /* Apply -1 charge penalty to rewind skill */
+                        if (this.playback) this.playback.applyTimerPenalty();
                         this._doRandomMove();
                     }
                 }, 1000);
@@ -2432,8 +2892,6 @@ self.onmessage=function(e){
                 const topTier = scored.filter(s => s.selfDestructScore >= topScore - 50);
                 const chosen = topTier[Math.floor(Math.random() * topTier.length)].m;
 
-                this.fx.spawnComment('TIME UP! SELF DESTRUCT!', 'fc-danger');
-                this.fx.spawnComment('OMEGALUL', 'fc-danger');
                 this.fx.flashBoard('rgba(255,0,0,0.4)');
                 this.fx.shakeBoard();
                 this.exec(chosen, 'player');
@@ -2474,7 +2932,29 @@ self.onmessage=function(e){
                     if (dangerWhite.has(i)) sq.classList.add('danger-white');
                     if (threatBlack === i) sq.classList.add('threat-black');
                     if (bestWhiteSource === i) sq.classList.add('hint-blue');
-                    const p = this.g.board[i]; if (p) { sq.dataset.color = this.g.col(i); sq.textContent = this.SYM[p]; }
+                    let displayPiece = this.g.board[i];
+                    /* Apply enemy skill effects */
+                    if (this.isRaid && this.enemySkills) {
+                        /* Mist: show ? for black pieces */
+                        if (this.enemySkills.active.mist > 0 && displayPiece && this.g.col(i) === 'b') {
+                            sq.dataset.color = 'b';
+                            sq.textContent = '?';
+                        } else if (displayPiece) {
+                            sq.dataset.color = this.g.col(i);
+                            /* Fade: this black piece is faded */
+                            if (this.enemySkills.active.fadeIdx === i) {
+                                sq.style.opacity = '0.25';
+                            }
+                            sq.textContent = this.SYM[displayPiece];
+                        }
+                        /* Fill: blocked square */
+                        if (this.enemySkills.active.fillIdx === i) sq.classList.add('skill-fill');
+                        /* Lock: locked white piece */
+                        if (this.enemySkills.active.lockIdx === i) sq.classList.add('skill-lock');
+                    } else if (displayPiece) {
+                        sq.dataset.color = this.g.col(i);
+                        sq.textContent = this.SYM[displayPiece];
+                    }
                     sq.onclick = () => this.click(i); board.appendChild(sq);
                 }
                 this.updateSide();
@@ -2485,10 +2965,24 @@ self.onmessage=function(e){
                 this.playSfx('Click.mp3');
                 const mv = this.valid.find(m => m.t === i);
                 if (mv) {
+                    /* Check Fill: can't move to blocked square */
+                    if (this.isRaid && this.enemySkills && this.enemySkills.active.fillIdx === i) {
+                        this.fx.flashBoard('rgba(170,0,255,0.3)'); return;
+                    }
                     if (this.g.board[mv.f] === 'P' && Math.floor(i / 8) === 0) { this.pend = mv; document.getElementById('promo-modal').classList.remove('hidden'); return; }
                     this.exec(mv, 'player');
                 } else {
-                    if (this.g.col(i) === 'w') { this.sel = i; this.valid = this.g.moves(i); }
+                    if (this.g.col(i) === 'w') {
+                        /* Check Lock: can't select locked piece */
+                        if (this.isRaid && this.enemySkills && this.enemySkills.active.lockIdx === i) {
+                            this.fx.flashBoard('rgba(255,0,100,0.3)'); this.render(); return;
+                        }
+                        this.sel = i; this.valid = this.g.moves(i);
+                        /* Filter out Fill-blocked destinations */
+                        if (this.isRaid && this.enemySkills && this.enemySkills.active.fillIdx !== null) {
+                            this.valid = this.valid.filter(m => m.t !== this.enemySkills.active.fillIdx);
+                        }
+                    }
                     else { this.sel = null; this.valid = []; }
                 }
                 this.render();
@@ -2532,6 +3026,8 @@ self.onmessage=function(e){
                 this.thinking = true;
                 /* Show blank timer during AI turn */
                 if (this.isRaid) this._showTimerBlank();
+                /* Disable rewind button during enemy turn */
+                if (this.playback) this.playback.setEnemyTurn(true);
                 document.getElementById('ai-card').classList.add('active-card');
                 document.getElementById('me-card').classList.remove('active-card');
                 document.getElementById('ai-status').innerHTML = '<span class="think-spinner"></span>Searching...';
@@ -2547,13 +3043,42 @@ self.onmessage=function(e){
             }
 
             onResult(move, depth) {
-                this.thinking = false;
                 if (move) {
                     move.piece = this.g.board[move.f];
                     if (this.isRaid) {
-                        setTimeout(() => { this.exec(move, 'ai'); this._afterAI(depth); }, 200);
-                    } else { this.exec(move, 'ai'); this._afterAI(depth); }
-                } else { this._afterAI(depth); }
+                        /* Enemy skill fires before move */
+                        const skillDelay = this.enemySkills.tryActivate(this.g);
+                        const execDelay = skillDelay > 0 ? skillDelay + 200 : 200;
+                        setTimeout(() => {
+                            this.thinking = false;
+                            const res = this.execAI(move);
+                            if (!res) this._afterAI(depth);
+                        }, execDelay);
+                    } else {
+                        this.thinking = false;
+                        const res = this.execAI(move);
+                        if (!res) this._afterAI(depth);
+                    }
+                } else {
+                    this.thinking = false;
+                    this._afterAI(depth);
+                }
+            }
+            /* Execute AI move; returns true if game ended */
+            execAI(move) {
+                if (this.isRaid) this.g.saveSnapshot();
+                const isCapture = !!this.g.board[move.t] || !!move.ep;
+                this.g.apply(move);
+                this.last = move; this.sel = null; this.valid = [];
+                if (this.isRaid) {
+                    this.playSfx(isCapture ? 'Damage.mp3' : 'Move.mp3');
+                    this.fx.onAIMove(move, this.g);
+                    if (this.playback) this.playback.onMovePlayed();
+                }
+                this.render();
+                const res = this.g.over();
+                if (res) { this.endGame(res); return true; }
+                return false;
             }
 
             _afterAI(depth) {
@@ -2564,6 +3089,10 @@ self.onmessage=function(e){
                 document.getElementById('me-status').textContent = 'Your Turn';
                 document.getElementById('me-status').classList.add('live');
                 document.getElementById('depth-cur').textContent = 'depth ' + depth;
+                /* Enemy skill: tick cooldown each turn */
+                if (this.isRaid) { this.enemySkills.onTurn(); this.render(); }
+                /* Re-enable rewind button for player's turn */
+                if (this.playback) this.playback.setEnemyTurn(false);
                 /* Start raid timer for player's turn */
                 if (this.isRaid) this.startRaidTimer();
             }
@@ -2599,11 +3128,32 @@ self.onmessage=function(e){
                 document.getElementById('end-sub').textContent = subs[res] || res;
                 if (this.isRaid) {
                     if (this.bgm) { this.bgm.pause(); this.bgm = null; }
-                    if (isAIWin) { this.fx.spawnComment('GG EZ', 'fc-danger'); this.fx.spawnComment('LULW', 'fc-danger'); this.fx.spawnComment('L + ratio', 'fc-danger'); this.fx.flashBoard('rgba(255,0,0,0.4)'); this.fx.shakeBoard(); this.fx.showBanner('GG WP', 4000); }
-                    else { this.fx.spawnComment('NOOOOOO', 'fc-rare'); this.fx.spawnComment('RIP AI', 'fc-rare'); this.fx.burstParticles(window.innerWidth / 2, window.innerHeight / 2, '#ffff00', 40); this.fx.showBanner('VICTORY', 4000); }
+                    /* Deactivate enemy skills */
+                    this.enemySkills.reset();
+                    if (isAIWin) {
+                        this.fx.flashBoard('rgba(255,0,0,0.4)'); this.fx.shakeBoard(); this.fx.showBanner('GG WP', 4000);
+                    } else {
+                        /* Player wins: record learning and award rank points */
+                        this.fx.burstParticles(window.innerWidth / 2, window.innerHeight / 2, '#ffff00', 40);
+                        this.fx.showBanner('VICTORY', 4000);
+                        const difficulty = this.raidRank.points;
+                        const pts = this.raidRank.recordWin(this.g);
+                        this._updateGameRankUI();
+                        setTimeout(() => {
+                            const rankEl = document.getElementById('end-sub');
+                            if (rankEl) rankEl.textContent += ` · +${pts} Raid Rank Pts → ${this.raidRank.getRankName()}`;
+                        }, 500);
+                    }
                 }
             }
-            playSfx(file) { const s = new Audio(file); s.play().catch(() => { }); }
+            playSfx(file) {
+                try {
+                    const s = new Audio(file);
+                    s.volume = 1.0;
+                    const p = s.play();
+                    if (p) p.catch(() => {});
+                } catch(e) {}
+            }
         }
         new UI();
     </script>
